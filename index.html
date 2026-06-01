@@ -2365,6 +2365,9 @@
   <div class="hero-select" id="heroSelect">HERO SELECT</div>
   <div class="hint" id="hint"></div>
 
+  <!-- Shown until the user interacts; satisfies browser autoplay gesture rules -->
+  <div class="audio-prompt" id="audioPrompt">CLICK TO START<small>tap anywhere to enable sound</small></div>
+
   <!-- Background music. src is set from BGM_PATH in JS. -->
   <!-- BGM A: MvC3 select theme; plays during the 'selecting' phase -->
   <audio id="bgmSelect" loop preload="auto"></audio>
@@ -4188,9 +4191,25 @@ function stopShow() {
 function unlockAudio() {
   audio();
   startBGM();
+  const prompt = document.getElementById('audioPrompt');
+  if (prompt) prompt.classList.add('hidden');
 }
 
 document.addEventListener('click', unlockAudio, { once: false });
+
+// Try to start music on load. Browsers usually block this until a user
+// gesture; if so, leave the CLICK TO START prompt visible. If autoplay is
+// allowed, hide the prompt right away.
+window.addEventListener('load', () => {
+  const a = activeBgm();
+  const p = a.play();
+  if (p && typeof p.then === 'function') {
+    p.then(() => {
+      bgmStarted = true;
+      document.getElementById('audioPrompt')?.classList.add('hidden');
+    }).catch(() => { /* autoplay blocked — prompt stays up until first click */ });
+  }
+});
 
 document.addEventListener('keydown', (e) => {
   unlockAudio();
