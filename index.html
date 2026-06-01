@@ -1,0 +1,4299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challenger's Special Night - Character Select</title>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Russo+One&family=Bangers&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Russo One', 'Impact', sans-serif;
+    user-select: none;
+    color: #fff;
+  }
+
+  /* ============================================================ */
+  /*  STARFIELD BACKGROUND                                        */
+  /* ============================================================ */
+  .stage {
+    position: relative;
+    width: 100%; height: 100%;
+    background: #000209;
+    overflow: hidden;
+  }
+
+  /* Layered starfield (many small stars at different scales) */
+  .starfield {
+    position: absolute;
+    inset: 0;
+    background-color: #000209;
+    background-image:
+      radial-gradient(ellipse at 50% 50%, rgba(20, 50, 110, 0.55) 0%, transparent 55%),
+      /* big stars */
+      radial-gradient(1.6px 1.6px at 12% 18%, #ffffff 50%, transparent 60%),
+      radial-gradient(1.4px 1.4px at 78% 64%, #cfe6ff 50%, transparent 60%),
+      radial-gradient(1.8px 1.8px at 28% 82%, #ffffff 50%, transparent 60%),
+      radial-gradient(1.4px 1.4px at 62% 14%, #cfe6ff 50%, transparent 60%),
+      radial-gradient(1.6px 1.6px at 92% 32%, #ffffff 50%, transparent 60%),
+      radial-gradient(1.4px 1.4px at  6% 54%, #cfe6ff 50%, transparent 60%),
+      /* medium stars */
+      radial-gradient(1px 1px at 22% 32%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 48% 22%, rgba(200,220,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 72% 48%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 36% 68%, rgba(200,220,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 88% 78%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 16% 88%, rgba(200,220,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 56% 88%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1px 1px at 96% 12%, rgba(200,220,255,0.85) 50%, transparent 60%),
+      /* tiny stars (denser) */
+      radial-gradient(0.6px 0.6px at 5% 10%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 15% 60%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 25% 35%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 33% 15%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 42% 78%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 51% 44%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 60% 28%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 70% 72%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 80% 18%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 86% 56%, rgba(255,255,255,0.55) 50%, transparent 60%),
+      radial-gradient(0.6px 0.6px at 94% 92%, rgba(255,255,255,0.55) 50%, transparent 60%);
+    background-repeat: no-repeat;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+  @keyframes twinkle {
+    from { opacity: 0.85; }
+    to   { opacity: 1; }
+  }
+
+  /* Sphere meridians (warped grid lines) */
+  .sphere-grid {
+    position: absolute;
+    width: 150vmin; height: 115vmin;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(120, 210, 255, 0.55))
+            drop-shadow(0 0 14px rgba(80, 180, 255, 0.35));
+  }
+
+  /* Top + bottom globe arcs - bright cyan curved rim of the sphere */
+  .arc {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 220vw;
+    height: 60vh;
+    pointer-events: none;
+    z-index: 2;
+    border-radius: 50%;
+    background: transparent;
+  }
+  .arc.top {
+    top: -52vh;
+    border-bottom: 2px solid rgba(170, 230, 255, 0.95);
+    box-shadow:
+      0 4px 24px rgba(140, 220, 255, 0.7),
+      0 18px 70px rgba(60, 160, 240, 0.35);
+  }
+  .arc.bottom {
+    bottom: -52vh;
+    border-top: 2px solid rgba(170, 230, 255, 0.95);
+    box-shadow:
+      0 -4px 24px rgba(140, 220, 255, 0.7),
+      0 -18px 70px rgba(60, 160, 240, 0.35);
+  }
+  /* secondary inner arc to suggest a band */
+  .arc::after {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    border: 1px solid rgba(120, 200, 255, 0.22);
+  }
+
+  /* ============================================================ */
+  /*  TIME COUNTER (top center) - sits inside top arc band         */
+  /* ============================================================ */
+  .time-counter {
+    position: absolute;
+    top: 1.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 5;
+  }
+  .time-label {
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    font-size: clamp(20px, 2.4vw, 36px);
+    letter-spacing: 0.42em;
+    color: #e7f4ff;
+    text-shadow: 0 0 14px rgba(120,210,255,0.95), 0 0 30px rgba(60,160,240,0.6);
+    margin-right: -0.42em;
+  }
+  .time-infinity {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(46px, 7.5vw, 100px);
+    color: #f6d758;
+    line-height: 0.8;
+    text-shadow:
+      0 0 16px rgba(255, 220, 80, 0.95),
+      0 0 36px rgba(255, 180, 0, 0.7);
+  }
+
+  /* ============================================================ */
+  /*  HERO SELECT (bottom center)                                  */
+  /* ============================================================ */
+  .hero-select {
+    position: absolute;
+    bottom: 3.5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    font-size: clamp(40px, 5.5vw, 80px);
+    letter-spacing: 0.18em;
+    color: #ffffff;
+    text-shadow:
+      0 0 6px rgba(255,255,255,0.95),
+      0 0 22px rgba(120,210,255,0.95),
+      0 0 48px rgba(60,140,220,0.9),
+      0 4px 0 #0a2150;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  .hero-select::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 60%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #f6d758 40%, #ffea88 50%, #f6d758 60%, transparent);
+    box-shadow: 0 0 14px rgba(246, 215, 88, 0.9);
+  }
+
+  /* ============================================================ */
+  /*  CHARACTER GRID  (3x3 = 9 portraits) - sits on curved surface */
+  /* ============================================================ */
+  .grid-wrapper {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  .grid {
+    --slot: clamp(100px, 11vw, 160px);
+    display: grid;
+    grid-template-columns: repeat(3, var(--slot));
+    grid-template-rows: repeat(3, var(--slot));
+    gap: 4px;
+    padding: 4px;
+  }
+  .slot {
+    position: relative;
+    width: var(--slot); height: var(--slot);
+    background: rgba(8, 18, 42, 0.55);
+    border: 1px solid rgba(150, 215, 255, 0.28);
+    overflow: hidden;
+    box-shadow:
+      inset 0 0 18px rgba(20, 50, 100, 0.35),
+      0 0 0 1px rgba(0, 20, 60, 0.4);
+  }
+  .slot img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transform: translateY(-12%) scale(1.35);
+    transform-origin: center top;
+  }
+  /* Columns 2 & 3 portraits sit 20% higher than column 1 */
+  .grid .slot:nth-child(3n+2) img,
+  .grid .slot:nth-child(3n) img {
+    transform: translateY(-32%) scale(1.35);
+  }
+  .slot-name {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0));
+    color: #fff;
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(7px, 0.75vw, 10px);
+    text-align: center;
+    padding: 10px 2px 3px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    text-transform: uppercase;
+    opacity: 0.82;
+  }
+  .slot.locked-p1 { box-shadow: inset 0 0 0 3px #f5d24e, 0 0 18px rgba(245, 210, 78, 0.8); }
+  .slot.locked-p2 { box-shadow: inset 0 0 0 3px #66c8ff, 0 0 18px rgba(102, 200, 255, 0.8); }
+  .slot.locked-p1.locked-p2 { box-shadow: inset 0 0 0 3px #ffffff, 0 0 22px rgba(255,255,255,0.9); }
+
+  /* ============================================================ */
+  /*  CURSORS (use TRANSFORM for smooth movement, no layout thrash)*/
+  /* ============================================================ */
+  .cursor {
+    position: absolute;
+    left: 0; top: 0;
+    width: var(--slot); height: var(--slot);
+    pointer-events: none;
+    z-index: 20;
+    transform: translate3d(0, 0, 0);
+    transition: transform 90ms cubic-bezier(.2, .8, .25, 1);
+    will-change: transform;
+  }
+  .cursor-box {
+    position: absolute;
+    inset: -4px;
+    border: 3px solid #f5d24e;
+    box-shadow:
+      0 0 18px rgba(245, 210, 78, 0.95),
+      inset 0 0 18px rgba(245, 210, 78, 0.55);
+    animation: cursorPulse 0.9s ease-in-out infinite alternate;
+  }
+  .cursor.p2 .cursor-box {
+    border-color: #66c8ff;
+    box-shadow:
+      0 0 18px rgba(102, 200, 255, 0.95),
+      inset 0 0 18px rgba(102, 200, 255, 0.55);
+  }
+  @keyframes cursorPulse {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.35); }
+  }
+  .cursor-label {
+    position: absolute;
+    bottom: -10px; right: -10px;
+    background: linear-gradient(to bottom, #ffeb73 0%, #d99c00 100%);
+    color: #2a1a00;
+    font-family: 'Bowlby One', sans-serif;
+    padding: 3px 9px 1px;
+    font-size: clamp(11px, 1vw, 15px);
+    letter-spacing: 0.06em;
+    border: 1px solid rgba(0,0,0,0.5);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    transform: skewX(-12deg);
+  }
+  .cursor.p2 .cursor-label {
+    background: linear-gradient(to bottom, #b8e8ff 0%, #1c80c8 100%);
+    color: #04243d;
+  }
+
+  /* ============================================================ */
+  /*  PREVIEW PANELS  (comic book covers, MvC3 style)              */
+  /* ============================================================ */
+  .preview {
+    position: absolute;
+    top: 50%;
+    width: clamp(240px, 26vw, 400px);
+    height: clamp(380px, 40vw, 620px);
+    z-index: 15;
+    filter: drop-shadow(0 0 30px rgba(120, 200, 255, 0.7))
+            drop-shadow(0 0 70px rgba(80, 160, 255, 0.45));
+  }
+  .preview.p1 {
+    left: 1.5vw;
+    transform: translateY(-50%) perspective(1600px) rotateY(24deg);
+    transform-origin: right center;
+  }
+  .preview.p2 {
+    right: 1.5vw;
+    transform: translateY(-50%) perspective(1600px) rotateY(-24deg);
+    transform-origin: left center;
+  }
+  .cover {
+    width: 100%; height: 100%;
+    position: relative;
+    overflow: hidden;
+    border: 4px solid #0a0a0a;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.85);
+    /* Dark cosmic base — character image overlays on top */
+    background:
+      radial-gradient(ellipse at 50% 30%,
+        rgba(60, 80, 150, 0.55) 0%,
+        rgba(20, 30, 80, 0.4) 40%,
+        rgba(5, 5, 25, 1) 90%),
+      linear-gradient(180deg, #0d1a4a 0%, #1a0930 60%, #050010 100%);
+  }
+  /* Warm orange sunburst rays radiating from behind the featured character */
+  .cover-burst {
+    position: absolute; inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    /* Soft warm halo behind the featured character — no rigid spokes */
+    background:
+      radial-gradient(circle at 50% 42%,
+        rgba(255, 220, 150, 0.7) 0%,
+        rgba(255, 150, 60, 0.45) 16%,
+        rgba(200, 70, 30, 0.25) 38%,
+        rgba(60, 10, 30, 0) 65%),
+      radial-gradient(ellipse 70% 90% at 50% 50%,
+        rgba(255, 180, 100, 0.18) 0%,
+        transparent 70%);
+    filter: blur(1.5px);
+    mix-blend-mode: screen;
+    opacity: 0;
+    transition: opacity 400ms ease;
+  }
+  .cover.has-feature .cover-burst { opacity: 1; }
+  /* Layered character art - each pick gets its own region on the cover.
+     All picks stay FULL SIZE and FULL COLOR; they just occupy different
+     positions so every selection is clearly visible (matches MvC3 reference). */
+  .cover-characters {
+    position: absolute; inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .cover-char {
+    position: absolute;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    transition: top 450ms cubic-bezier(.2,.9,.3,1.2),
+                left 450ms cubic-bezier(.2,.9,.3,1.2),
+                right 450ms cubic-bezier(.2,.9,.3,1.2),
+                bottom 450ms cubic-bezier(.2,.9,.3,1.2),
+                width 450ms cubic-bezier(.2,.9,.3,1.2),
+                height 450ms cubic-bezier(.2,.9,.3,1.2);
+    animation: charAppear 520ms cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes charAppear {
+    from { transform: scale(1.15) translateY(6%); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+
+  /* 1 pick - fills the cover */
+  .cover-characters[data-count="1"] .cover-char[data-recency="0"] {
+    top: 0; left: 0; width: 100%; height: 100%; z-index: 5;
+  }
+
+  /* 2 picks - diagonal: older = upper-left, newer = lower-right */
+  .cover-characters[data-count="2"] .cover-char[data-recency="1"] {
+    top: 0; left: -4%; width: 74%; height: 82%; z-index: 4;
+  }
+  .cover-characters[data-count="2"] .cover-char[data-recency="0"] {
+    bottom: 0; right: -4%; width: 80%; height: 90%; z-index: 5;
+  }
+
+  /* 3 picks - two in back at top, newest big in front-bottom */
+  .cover-characters[data-count="3"] .cover-char[data-recency="2"] {
+    top: 0; left: -6%; width: 60%; height: 66%; z-index: 3;
+  }
+  .cover-characters[data-count="3"] .cover-char[data-recency="1"] {
+    top: 6%; right: -6%; width: 60%; height: 66%; z-index: 4;
+  }
+  .cover-characters[data-count="3"] .cover-char[data-recency="0"] {
+    bottom: 0; left: 12%; width: 78%; height: 86%; z-index: 5;
+  }
+
+  /* 4 picks - corners + newest big in front-bottom */
+  .cover-characters[data-count="4"] .cover-char[data-recency="3"] {
+    top: 0; left: -6%; width: 56%; height: 60%; z-index: 2;
+  }
+  .cover-characters[data-count="4"] .cover-char[data-recency="2"] {
+    top: 0; right: -6%; width: 56%; height: 60%; z-index: 3;
+  }
+  .cover-characters[data-count="4"] .cover-char[data-recency="1"] {
+    bottom: 0; left: -6%; width: 56%; height: 60%; z-index: 4;
+  }
+  .cover-characters[data-count="4"] .cover-char[data-recency="0"] {
+    bottom: 0; right: -6%; width: 66%; height: 72%; z-index: 5;
+  }
+
+  /* P2 mirrors the horizontal positions (older picks fan opposite side) */
+  .preview.p2 .cover-characters[data-count="2"] .cover-char[data-recency="1"] { left: auto; right: -4%; }
+  .preview.p2 .cover-characters[data-count="2"] .cover-char[data-recency="0"] { right: auto; left: -4%; }
+  .preview.p2 .cover-characters[data-count="3"] .cover-char[data-recency="2"] { left: auto; right: -6%; }
+  .preview.p2 .cover-characters[data-count="3"] .cover-char[data-recency="1"] { right: auto; left: -6%; }
+  .preview.p2 .cover-characters[data-count="3"] .cover-char[data-recency="0"] { left: auto; right: 12%; }
+  .preview.p2 .cover-characters[data-count="4"] .cover-char[data-recency="3"] { left: auto; right: -6%; }
+  .preview.p2 .cover-characters[data-count="4"] .cover-char[data-recency="2"] { right: auto; left: -6%; }
+  .preview.p2 .cover-characters[data-count="4"] .cover-char[data-recency="1"] { left: auto; right: -6%; }
+  .preview.p2 .cover-characters[data-count="4"] .cover-char[data-recency="0"] { right: auto; left: -6%; }
+  /* Empty state */
+  .cover-characters.empty::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center 35%, rgba(255,200,100,0.15), transparent 70%);
+  }
+  /* dark gradient overlay so text stays readable */
+  .cover-shade {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.78) 95%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Hover slot: the cursor's currently-hovered character is rendered
+     as an additional .cover-char.hover inside .cover-characters so it
+     inherits the same count=1/2/3/4 layout rules as confirmed picks
+     (i.e. layered alongside, not overlaid on top). The .hover modifier
+     makes it translucent and adds a scan-tint so the audience reads
+     it as "unconfirmed". */
+  .cover-char.hover {
+    opacity: 0.62;
+    filter: saturate(0.55) brightness(0.92) contrast(0.95);
+  }
+  .cover-char.hover::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg,
+        rgba(120, 210, 255, 0.22) 0%,
+        rgba(120, 210, 255, 0)    25%,
+        rgba(120, 210, 255, 0)    75%,
+        rgba(120, 210, 255, 0.22) 100%),
+      repeating-linear-gradient(0deg,
+        rgba(120, 210, 255, 0.08) 0 1px,
+        transparent 1px 4px);
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .preview.p1 .cover-char.hover::after {
+    background:
+      linear-gradient(180deg,
+        rgba(245, 210, 78, 0.20) 0%,
+        rgba(245, 210, 78, 0)    25%,
+        rgba(245, 210, 78, 0)    75%,
+        rgba(245, 210, 78, 0.20) 100%),
+      repeating-linear-gradient(0deg,
+        rgba(245, 210, 78, 0.08) 0 1px,
+        transparent 1px 4px);
+  }
+  /* Corner badge that reads "PREVIEW" so it's obvious this isn't a lock-in */
+  .cover-hover-badge {
+    position: absolute;
+    top: 38%;
+    right: -4px;
+    background: linear-gradient(180deg, #1d2d4a 0%, #0a1428 100%);
+    color: #b8e8ff;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(8px, 0.8vw, 11px);
+    letter-spacing: 0.22em;
+    padding: 3px 8px 2px;
+    border: 1px solid rgba(120, 210, 255, 0.7);
+    box-shadow: 0 0 12px rgba(80, 180, 255, 0.55);
+    transform: skewX(-10deg) translateX(0);
+    opacity: 0;
+    transition: opacity 220ms ease, transform 220ms ease;
+    text-shadow: 0 1px 0 #000;
+  }
+  .preview.p1 .cover-hover-badge {
+    color: #ffeb73;
+    border-color: rgba(245, 210, 78, 0.75);
+    box-shadow: 0 0 12px rgba(245, 210, 78, 0.55);
+  }
+  .cover.preview-hover .cover-hover-badge {
+    opacity: 1;
+    transform: skewX(-10deg) translateX(-6px);
+    animation: previewBadgePulse 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes previewBadgePulse {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.35); }
+  }
+  /* When in hover state, the big character name shifts to a dimmer,
+     italicized look — the audience sees the candidate name but knows
+     it's not locked in yet. */
+  .cover.preview-hover .big-name {
+    color: rgba(255, 255, 255, 0.62);
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.55);
+    text-shadow:
+      0 3px 0 rgba(0, 0, 0, 0.85),
+      0 0 14px rgba(255, 255, 255, 0.25);
+    font-style: italic;
+  }
+
+  /* Spine - visible thickness of the book on outer edge */
+  .spine {
+    position: absolute;
+    top: -4px; bottom: -4px;
+    width: 26px;
+    background:
+      linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 100%),
+      repeating-linear-gradient(to bottom,
+        #b62416 0 8px, #8a1a10 8px 16px);
+    border: 2px solid #0a0a0a;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff7e2;
+    font-size: clamp(9px, 0.85vw, 13px);
+    letter-spacing: 0.18em;
+    font-family: 'Bowlby One', sans-serif;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    text-shadow: 0 1px 0 #000, 0 0 6px rgba(255,200,100,0.5);
+    white-space: nowrap;
+    padding: 14px 0;
+    overflow: hidden;
+    z-index: 5;
+  }
+  .preview.p1 .spine { right: -26px; }
+  .preview.p2 .spine { left: -26px; }
+
+  /* MvC3-style stacked logo block in top-left corner */
+  .logo-block {
+    position: absolute;
+    top: 12px; left: 14px;
+    z-index: 6;
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.9));
+  }
+  .logo-marvel-row {
+    display: flex; align-items: flex-end; gap: 6px;
+  }
+  .logo-marvel {
+    background: #d70a0a;
+    color: #fff;
+    padding: 4px 12px 3px;
+    font-size: clamp(13px, 1.5vw, 22px);
+    letter-spacing: 0.06em;
+    border: 1.5px solid #000;
+    text-shadow: 0 1px 0 #5a0000;
+    display: inline-block;
+  }
+  .logo-vs {
+    font-family: 'Bangers', cursive;
+    color: #fff;
+    font-size: clamp(11px, 1.05vw, 16px);
+    font-style: italic;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.95), 0 0 4px rgba(0,0,0,0.9);
+    padding-bottom: 4px;
+  }
+  .logo-capcom-row {
+    display: flex; align-items: flex-end; gap: 4px;
+    margin-top: 2px;
+  }
+  .logo-capcom {
+    color: #f1a31a;
+    font-size: clamp(15px, 1.7vw, 26px);
+    -webkit-text-stroke: 1.5px #000;
+    paint-order: stroke fill;
+    text-shadow: 0 2px 0 #000;
+    letter-spacing: 0.04em;
+    transform: skewX(-4deg);
+  }
+  .logo-num {
+    color: #f1a31a;
+    font-size: clamp(28px, 3.2vw, 50px);
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+    text-shadow: 0 3px 0 #000;
+    line-height: 0.85;
+    transform: skewX(-4deg);
+  }
+  .logo-sub {
+    margin-top: 2px;
+    color: #ffd24a;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(9px, 0.95vw, 13px);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+    font-style: italic;
+    max-width: 85%;
+    line-height: 1.05;
+  }
+
+  /* Player flag in top-right corner */
+  .player-flag {
+    position: absolute;
+    top: 14px; right: 14px;
+    z-index: 4;
+    background: rgba(0,0,0,0.78);
+    color: #fff;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(11px, 1vw, 16px);
+    padding: 4px 12px;
+    letter-spacing: 0.14em;
+    border: 1px solid rgba(255,255,255,0.5);
+    transform: skewX(-10deg);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+
+  /* Big horizontal character name at bottom */
+  .big-name {
+    position: absolute;
+    bottom: 6%;
+    right: 5%;
+    left: 38%;
+    z-index: 5;
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    font-size: clamp(36px, 5.2vw, 78px);
+    color: #ffffff;
+    letter-spacing: 0.04em;
+    line-height: 0.88;
+    text-shadow:
+      0 4px 0 #000,
+      0 6px 12px rgba(0,0,0,0.9),
+      0 0 14px rgba(255,255,255,0.4);
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+    pointer-events: none;
+    text-align: right;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .big-name.empty {
+    color: rgba(255,255,255,0.28);
+    -webkit-text-stroke: 1px rgba(0,0,0,0.5);
+  }
+
+  /* ASSIST TYPE panel (centered upper-middle of cover) */
+  .assist-panel {
+    position: absolute;
+    top: 15%;
+    left: 7%;
+    right: 7%;
+    z-index: 5;
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    pointer-events: none;
+  }
+  .assist-header {
+    display: inline-block;
+    padding: 4px 22px 3px 16px;
+    font-size: clamp(10px, 1.05vw, 16px);
+    color: #ffeb73;
+    letter-spacing: 0.16em;
+    background: linear-gradient(180deg, #0a1f12 0%, #08160d 100%);
+    border: 2px solid #5cdb6e;
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    text-shadow: 0 1px 0 #000;
+    margin-left: 12%;
+    box-shadow: 0 -2px 12px rgba(92, 219, 110, 0.5);
+    position: relative;
+    z-index: 2;
+  }
+  .assist-body {
+    background:
+      repeating-linear-gradient(0deg, rgba(92, 219, 110, 0.22) 0 1px, transparent 1px 9px),
+      repeating-linear-gradient(90deg, rgba(92, 219, 110, 0.22) 0 1px, transparent 1px 9px),
+      linear-gradient(180deg, rgba(10, 35, 22, 0.92), rgba(5, 22, 12, 0.92));
+    border: 2px solid #5cdb6e;
+    border-radius: 10px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow:
+      0 0 18px rgba(92, 219, 110, 0.55),
+      inset 0 0 14px rgba(92, 219, 110, 0.15);
+  }
+  .assist-type-label {
+    color: #ffeb73;
+    font-size: clamp(9px, 0.9vw, 13px);
+    letter-spacing: 0.1em;
+    text-shadow: 0 1px 0 #000;
+    line-height: 0.9;
+  }
+  .assist-greek {
+    color: #5cdb6e;
+    font-size: clamp(32px, 3.6vw, 54px);
+    line-height: 0.85;
+    text-shadow:
+      0 0 14px rgba(92, 219, 110, 0.85),
+      0 3px 0 #000;
+    -webkit-text-stroke: 1.5px #000;
+    paint-order: stroke fill;
+    font-style: italic;
+    font-family: 'Bowlby One', serif;
+  }
+  .assist-name {
+    color: #ffffff;
+    font-size: clamp(13px, 1.5vw, 22px);
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 0 #000, 0 0 6px rgba(0,0,0,0.8);
+    flex: 1;
+    text-align: right;
+    text-transform: capitalize;
+  }
+  .assist-tags {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+    padding-left: 14%;
+  }
+  .assist-tag {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(9px, 0.95vw, 14px);
+    padding: 4px 14px 3px;
+    letter-spacing: 0.12em;
+    color: #fff;
+    text-shadow: 0 1px 0 #000;
+    border: 1.5px solid #000;
+    position: relative;
+    line-height: 1;
+  }
+  .assist-tag.shot {
+    background: linear-gradient(180deg, #5fd0e0 0%, #2a8395 100%);
+    border-radius: 3px;
+  }
+  .assist-tag.front {
+    background: linear-gradient(180deg, #ffc448 0%, #b87b0a 100%);
+    border-radius: 3px;
+    padding-right: 22px;
+  }
+  .assist-tag.front::after {
+    content: '';
+    position: absolute;
+    right: 5px; top: 50%;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 5px 0 5px 7px;
+    border-color: transparent transparent transparent #fff;
+    transform: translateY(-50%);
+    filter: drop-shadow(0 1px 0 #000);
+  }
+
+  /* Small team-pick thumbnail strip at bottom-left, above the barcode */
+  .stack {
+    position: absolute;
+    bottom: 8%;
+    left: 5%;
+    width: 30%;
+    height: 12%;
+    z-index: 5;
+    display: flex; flex-direction: row;
+    gap: 4px;
+    pointer-events: none;
+  }
+  .stack .slot-pick {
+    flex: 1;
+    background: rgba(11,29,58,0.6);
+    border: 2px solid rgba(255,255,255,0.7);
+    overflow: hidden;
+    position: relative;
+    opacity: 0;
+    transition: opacity 250ms ease;
+    min-height: 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.75);
+  }
+  .stack .slot-pick.filled {
+    opacity: 1;
+    animation: dropIn 450ms cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes dropIn {
+    from { transform: scale(1.6) rotate(-6deg); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+  }
+  .stack .slot-pick img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+  .stack .slot-pick .pick-name {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(7px, 0.7vw, 10px);
+    text-align: center;
+    padding: 1px 2px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Proper UPC barcode in bottom-left */
+  .barcode {
+    position: absolute;
+    bottom: 8px;
+    width: 68px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #000;
+    padding: 2px 3px 0;
+    display: flex; flex-direction: column;
+    z-index: 6;
+  }
+  .preview.p1 .barcode { left: 12px; }
+  .preview.p2 .barcode { right: 12px; }
+  .barcode-bars {
+    flex: 1;
+    background-image:
+      repeating-linear-gradient(to right,
+        #000 0, #000 1px, transparent 1px, transparent 2px,
+        #000 2px, #000 4px, transparent 4px, transparent 5px,
+        #000 5px, #000 6px, transparent 6px, transparent 8px,
+        #000 8px, #000 11px, transparent 11px, transparent 12px,
+        #000 12px, #000 13px, transparent 13px, transparent 15px);
+    background-size: 15px 100%;
+  }
+  .barcode-num {
+    color: #000;
+    font-family: 'Courier New', monospace;
+    font-size: 6px;
+    text-align: center;
+    line-height: 1;
+    padding-top: 1px;
+    letter-spacing: 0.6px;
+  }
+
+  /* ============================================================ */
+  /*  STATUS HINT                                                  */
+  /* ============================================================ */
+  .hint {
+    position: absolute;
+    bottom: 1vh; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(9px, 0.85vw, 12px);
+    color: rgba(200, 220, 255, 0.55);
+    letter-spacing: 0.16em;
+    z-index: 5;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ============================================================ */
+  /*  VS SCREEN                                                    */
+  /* ============================================================ */
+  .vs-screen {
+    position: fixed; inset: 0;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    background: #000209;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    justify-items: center;
+    overflow: hidden;
+  }
+  .vs-screen .starfield, .vs-screen .arc, .vs-screen .sphere-grid {
+    z-index: 0;
+  }
+  .vs-screen.visible {
+    opacity: 1;
+    pointer-events: auto;
+    animation: vsEnter 800ms cubic-bezier(.2,.9,.3,1.05);
+  }
+  @keyframes vsEnter {
+    0%   { opacity: 0; transform: scale(1.15); filter: blur(8px); }
+    60%  { opacity: 1; transform: scale(0.98); filter: blur(0); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .vs-side {
+    position: relative;
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0 4vw;
+    z-index: 6;
+  }
+  .vs-side-label {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(22px, 3vw, 44px);
+    letter-spacing: 0.2em;
+    color: #fff;
+    text-shadow: 0 0 18px rgba(120,200,255,0.9), 0 4px 0 #0a2150;
+    opacity: 0;
+    animation: fadeInLate 600ms ease 1500ms forwards;
+  }
+  .vs-side.p1 .vs-side-label { color: #ffeb73; text-shadow: 0 0 18px rgba(255,210,70,0.95), 0 4px 0 #4a2a00; }
+  .vs-side.p2 .vs-side-label { color: #b8e8ff; text-shadow: 0 0 18px rgba(102,200,255,0.95), 0 4px 0 #042a4a; }
+
+  /* Portraits positioned diagonally to mimic dramatic team pose */
+  .vs-portraits {
+    position: relative;
+    width: clamp(220px, 30vw, 460px);
+    height: clamp(280px, 38vw, 580px);
+  }
+  .vs-portrait {
+    position: absolute;
+    width: clamp(150px, 18vw, 280px);
+    height: clamp(220px, 26vw, 400px);
+    overflow: visible;
+    transform: scale(0);
+    opacity: 0;
+    animation: portraitPop 700ms cubic-bezier(.2, .9, .3, 1.3) forwards;
+    filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.85))
+            drop-shadow(0 0 18px rgba(255, 255, 255, 0.25));
+  }
+  .vs-side.p1 .vs-portrait {
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.85))
+            drop-shadow(0 0 22px rgba(245,210,78,0.55));
+  }
+  .vs-side.p2 .vs-portrait {
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.85))
+            drop-shadow(0 0 22px rgba(102,200,255,0.55));
+  }
+
+  /* P1 lineup: front-most portrait closer to center, back portrait higher-left */
+  .vs-side.p1 .vs-portrait:nth-child(1) { top: 4%;  left: 4%;  z-index: 1; transform-origin: bottom right; }
+  .vs-side.p1 .vs-portrait:nth-child(2) { bottom: 4%; right: 4%;  z-index: 3; width: clamp(180px, 22vw, 340px); height: clamp(180px, 22vw, 340px); transform-origin: bottom right; }
+  .vs-side.p1 .vs-portrait:nth-child(3) { top: 28%; left: 30%; z-index: 2; }
+  .vs-side.p1 .vs-portrait:nth-child(4) { bottom: 22%; left: 14%; z-index: 2; }
+
+  /* P2 lineup mirrors P1 */
+  .vs-side.p2 .vs-portrait:nth-child(1) { top: 4%;  right: 4%; z-index: 1; transform-origin: bottom left; }
+  .vs-side.p2 .vs-portrait:nth-child(2) { bottom: 4%; left: 4%; z-index: 3; width: clamp(180px, 22vw, 340px); height: clamp(180px, 22vw, 340px); transform-origin: bottom left; }
+  .vs-side.p2 .vs-portrait:nth-child(3) { top: 28%; right: 30%; z-index: 2; }
+  .vs-side.p2 .vs-portrait:nth-child(4) { bottom: 22%; right: 14%; z-index: 2; }
+
+  .vs-portrait img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    /* Soft edge fade so the photo blends into the background instead of looking like a card */
+    -webkit-mask-image: radial-gradient(ellipse 80% 90% at center 35%, black 55%, transparent 100%);
+            mask-image: radial-gradient(ellipse 80% 90% at center 35%, black 55%, transparent 100%);
+    /* Start as silhouette, then resolve to color */
+    filter: brightness(0) contrast(2);
+    animation: silhouetteToColor 1100ms ease-out forwards;
+    animation-delay: 1100ms;
+  }
+  @keyframes silhouetteToColor {
+    0%   { filter: brightness(0) contrast(2); }
+    35%  { filter: brightness(0) contrast(2); }
+    65%  { filter: brightness(0.5) contrast(1.6); }
+    100% { filter: brightness(1) contrast(1); }
+  }
+  .vs-portrait .pname {
+    position: absolute;
+    left: 50%; bottom: -10px;
+    transform: translateX(-50%);
+    color: #fff;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(11px, 1.1vw, 18px);
+    text-align: center;
+    padding: 0;
+    background: none;
+    letter-spacing: 0.08em;
+    text-shadow: 0 2px 0 #000, 0 0 10px rgba(0,0,0,0.9), 0 0 18px rgba(0,0,0,0.7);
+    white-space: nowrap;
+    opacity: 0;
+    animation: fadeInLate 500ms ease 1700ms forwards;
+  }
+  @keyframes fadeInLate { to { opacity: 1; } }
+
+  @keyframes portraitPop {
+    0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+    60%  { transform: scale(1.08) rotate(3deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .vs-portrait:nth-child(1) { animation-delay: 450ms; }
+  .vs-portrait:nth-child(2) { animation-delay: 650ms; }
+  .vs-portrait:nth-child(3) { animation-delay: 850ms; }
+  .vs-portrait:nth-child(4) { animation-delay: 1050ms; }
+
+  /* ----- The bright light transition (MvC3 confirm-flash) ----- */
+  .vs-white-burst {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 60vmin; height: 60vmin;
+    transform: translate(-50%, -50%) scale(0.1);
+    border-radius: 50%;
+    background: radial-gradient(circle,
+      rgba(255,255,255,1) 0%,
+      rgba(255,250,220,0.95) 18%,
+      rgba(255,220,140,0.6) 40%,
+      rgba(255,180,90,0.25) 60%,
+      transparent 85%);
+    z-index: 4;
+    opacity: 0;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    filter: blur(2px);
+  }
+  .vs-screen.visible .vs-white-burst {
+    animation: whiteBurst 2000ms cubic-bezier(.15,.7,.2,1) forwards;
+  }
+  @keyframes whiteBurst {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.05); }
+    12%  { opacity: 1; transform: translate(-50%, -50%) scale(1.8); }
+    50%  { opacity: 0.85; transform: translate(-50%, -50%) scale(2.6); }
+    100% { opacity: 0.25; transform: translate(-50%, -50%) scale(3.4); }
+  }
+
+  /* Soft sparkle backdrop (replaces the rigid 12-spoke ray pattern) */
+  .vs-rays {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 180vmax; height: 180vmax;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    background:
+      radial-gradient(2px 2px at 18% 22%, rgba(255,255,255,0.95) 50%, transparent 60%),
+      radial-gradient(1.6px 1.6px at 72% 18%, rgba(255,230,255,0.9) 50%, transparent 60%),
+      radial-gradient(2.4px 2.4px at 32% 64%, rgba(255,255,255,0.85) 50%, transparent 60%),
+      radial-gradient(1.4px 1.4px at 82% 72%, rgba(255,210,235,0.9) 50%, transparent 60%),
+      radial-gradient(1.8px 1.8px at 48% 38%, rgba(255,255,255,0.8) 50%, transparent 60%),
+      radial-gradient(1.2px 1.2px at 12% 78%, rgba(255,255,255,0.7) 50%, transparent 60%),
+      radial-gradient(2px 2px at 88% 42%, rgba(255,220,240,0.85) 50%, transparent 60%),
+      radial-gradient(1.5px 1.5px at 58% 88%, rgba(255,255,255,0.75) 50%, transparent 60%),
+      radial-gradient(ellipse at 50% 50%,
+        rgba(255, 120, 190, 0.18) 0%,
+        rgba(180, 60, 140, 0.10) 30%,
+        transparent 65%);
+    filter: blur(0.4px);
+  }
+  .vs-screen.visible .vs-rays {
+    animation: raysFade 2400ms ease-out forwards;
+  }
+  @keyframes raysFade {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    20%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    60%  { opacity: 0.8; transform: translate(-50%, -50%) scale(1.05); }
+    100% { opacity: 0.45; transform: translate(-50%, -50%) scale(1.1); }
+  }
+
+  .vs-center {
+    position: relative;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(140px, 26vw, 400px);
+    line-height: 0.85;
+    color: #ec3a78;
+    -webkit-text-stroke: 2px #ffffff;
+    letter-spacing: -0.02em;
+    transform: scale(0);
+    animation: vsPop 700ms cubic-bezier(.2,.9,.25,1.2) forwards;
+    animation-delay: 700ms;
+    filter:
+      drop-shadow(0 0 12px rgba(255, 90, 160, 0.95))
+      drop-shadow(0 0 40px rgba(236, 58, 120, 0.85))
+      drop-shadow(0 0 90px rgba(236, 58, 120, 0.6));
+    z-index: 5;
+  }
+  @keyframes vsPop {
+    0%   { transform: scale(2.4); opacity: 0; }
+    55%  { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .vs-shock {
+    position: absolute;
+    width: 60vmin; height: 60vmin;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,180,210,0.4) 0%, rgba(236,58,120,0.25) 35%, transparent 70%);
+    z-index: 1;
+    animation: shock 1100ms ease-out forwards;
+    animation-delay: 1300ms;
+  }
+  @keyframes shock {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+  }
+  .vs-replay {
+    position: absolute;
+    bottom: 4vh; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Russo One', sans-serif;
+    font-size: clamp(12px, 1vw, 16px);
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.18em;
+    opacity: 0;
+    animation: fadeIn 600ms ease forwards;
+    animation-delay: 1400ms;
+    z-index: 5;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .vs-flash {
+    position: fixed; inset: 0;
+    background: white;
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .vs-flash.go { animation: flash 600ms ease-out; }
+  @keyframes flash {
+    0%   { opacity: 0; }
+    20%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* ============================================================ */
+  /*  FIGHT SCREEN                                                */
+  /* ============================================================ */
+  .fight-screen {
+    position: fixed; inset: 0;
+    z-index: 90;
+    /* Fight-scene wallpaper (this stage image only applies to the fight
+       screen — select/VS/ulti are unaffected). Gradient kept as fallback. */
+    background: url("fight-bg.jpg") center / cover no-repeat,
+                radial-gradient(ellipse at 50% 100%, #1a0a3a 0%, #050018 70%, #000 100%);
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+    transition: opacity 400ms ease;
+  }
+  .fight-screen.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  /* Let the fight-scene wallpaper show through: drop the starfield's opaque
+     dark fill (keep only its twinkling stars layered over the stage image). */
+  .fight-screen .starfield { z-index: 0; opacity: 0.6; background-color: transparent; }
+
+  .fight-time-wrap {
+    position: absolute;
+    top: 1.5vh; left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+  }
+  .fight-time-label {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(14px, 1.6vw, 24px);
+    letter-spacing: 0.42em;
+    color: #e7f4ff;
+    text-shadow: 0 0 12px rgba(120,210,255,0.95);
+    margin-right: -0.42em;
+  }
+  .fight-time {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(34px, 5vw, 70px);
+    color: #f6d758;
+    line-height: 0.85;
+    text-shadow: 0 0 14px rgba(255, 220, 80, 0.95), 0 0 28px rgba(255, 180, 0, 0.6);
+  }
+
+  .fight-hud {
+    position: absolute;
+    top: 2vh;
+    width: 47vw;          /* fixed width so both HUDs are guaranteed equal */
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    z-index: 12;
+  }
+  .fight-hud.p1 { left: 1.5vw; }
+  .fight-hud.p2 { right: 1.5vw; }
+
+  .fight-portrait {
+    width: clamp(110px, 10vw, 170px);
+    height: clamp(110px, 10vw, 170px);
+    background: #0b1d3a;
+    border: 4px solid #000;
+    box-shadow: 0 0 0 3px #ffd24a, 0 8px 22px rgba(0,0,0,0.9);
+    overflow: hidden;
+    flex: 0 0 auto;
+    position: relative;
+  }
+  .fight-hud.p2 .fight-portrait {
+    box-shadow: 0 0 0 3px #66c8ff, 0 8px 22px rgba(0,0,0,0.9);
+  }
+  .fight-portrait img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    display: block;
+  }
+
+  .fight-bars {
+    flex: 1 1 0;          /* fill remaining HUD width = equal on both sides */
+    min-width: 0;
+    display: flex; flex-direction: column;
+    gap: 8px;
+  }
+
+  .hp-track {
+    position: relative;
+    height: clamp(38px, 4.2vw, 60px);
+    background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 3px solid #000;
+    box-shadow:
+      inset 0 0 0 2px rgba(255,255,255,0.22),
+      0 6px 16px rgba(0,0,0,0.8);
+    transform: skewX(-22deg);
+    overflow: hidden;
+  }
+  .hp-track.right { transform: skewX(22deg); }
+
+  .hp-fill {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 100%;
+    background: linear-gradient(180deg,
+      #ffeb73 0%, #ffd24a 22%, #f6a01b 55%, #c54d10 100%);
+    transition: width 280ms cubic-bezier(.2,.7,.2,1), background 280ms ease;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -3px 0 rgba(0,0,0,0.35);
+  }
+  .hp-track.right .hp-fill { left: auto; right: 0; }
+  .hp-fill.low {
+    background: linear-gradient(180deg, #ff8a55 0%, #ff4a2a 35%, #c41a10 100%);
+    animation: hpPulse 0.7s ease-in-out infinite alternate;
+  }
+  @keyframes hpPulse {
+    from { filter: brightness(1); }
+    to   { filter: brightness(1.4); }
+  }
+  .hp-fill.empty { background: linear-gradient(180deg, #555 0%, #222 100%); }
+
+  .hp-name {
+    position: absolute;
+    top: 50%; left: 18px;
+    transform: skewX(22deg) translateY(-50%);
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(22px, 2.6vw, 36px);
+    color: #fff;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-shadow: 0 3px 0 #000, 0 0 14px rgba(0,0,0,0.9);
+    pointer-events: none;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  .hp-track.right .hp-name {
+    left: auto; right: 18px;
+    transform: skewX(-22deg) translateY(-50%);
+  }
+
+  .reserve-list {
+    display: flex;
+    gap: 6px;
+    padding-left: 6%;
+  }
+  .reserve-list.right { padding-left: 0; padding-right: 6%; justify-content: flex-end; }
+  .reserve-pill {
+    height: clamp(20px, 2.2vw, 30px);
+    min-width: clamp(110px, 14vw, 200px);
+    background: linear-gradient(180deg, #ffd24a 0%, #c0801a 100%);
+    border: 2.5px solid #000;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.75);
+    transform: skewX(-22deg);
+    display: flex; align-items: center; justify-content: center;
+    color: #2a1500;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(13px, 1.4vw, 18px);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .fight-hud.p2 .reserve-pill {
+    transform: skewX(22deg);
+    background: linear-gradient(180deg, #b8e8ff 0%, #1c80c8 100%);
+    color: #03263d;
+  }
+  .reserve-pill > span { transform: skewX(22deg); display: inline-block; }
+  .fight-hud.p2 .reserve-pill > span { transform: skewX(-22deg); }
+  .reserve-pill.ko {
+    background: linear-gradient(180deg, #444 0%, #222 100%);
+    color: rgba(255,255,255,0.4);
+    text-decoration: line-through;
+  }
+
+  .fight-flash {
+    position: fixed; inset: 0;
+    z-index: 210;
+    opacity: 0;
+    pointer-events: none;
+    background: white;
+  }
+  .fight-flash.medium { animation: flashMed 380ms ease-out; }
+  .fight-flash.super  { animation: flashSup 900ms ease-out; }
+  @keyframes flashMed {
+    0%   { opacity: 0; background: white; }
+    25%  { opacity: 0.55; }
+    100% { opacity: 0; }
+  }
+  @keyframes flashSup {
+    0%   { opacity: 0; }
+    10%  { opacity: 1; background: white; }
+    35%  { opacity: 0.85; background: #fff7c0; }
+    65%  { opacity: 0.6;  background: #ff6c2a; }
+    100% { opacity: 0; }
+  }
+
+  /* Dim layer that darkens the background during a super, MvC-style */
+  .fight-dim {
+    position: fixed; inset: 0;
+    z-index: 208;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.0) 0%, rgba(0,0,0,0.85) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .fight-dim.on { opacity: 1; }
+
+  /* ----------- PROJECTILE (medium attack: Hadoken-style energy ball) ----------- */
+  .projectile {
+    position: fixed;
+    top: 48%;
+    width: clamp(180px, 22vw, 360px);
+    height: clamp(80px, 9vw, 140px);
+    margin-top: calc(clamp(80px, 9vw, 140px) / -2);
+    left: -40vw;
+    z-index: 216;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 0 30px #ff8a40) drop-shadow(0 0 80px #ff4020);
+  }
+  .projectile.fire-p1 { animation: projFlyL2R 1500ms cubic-bezier(.4,.1,.7,1) forwards; }
+  .projectile.fire-p2 { animation: projFlyR2L 1500ms cubic-bezier(.4,.1,.7,1) forwards; }
+  @keyframes projFlyL2R {
+    0%   { left: -40vw; transform: scale(0.4); opacity: 0; }
+    12%  { opacity: 1; transform: scale(1); }
+    88%  { opacity: 1; transform: scale(1); }
+    100% { left: 110vw; opacity: 0; transform: scale(1.35); }
+  }
+  @keyframes projFlyR2L {
+    0%   { left: 110vw; transform: scaleX(-1) scale(0.4); opacity: 0; }
+    12%  { opacity: 1; transform: scaleX(-1) scale(1); }
+    88%  { opacity: 1; transform: scaleX(-1) scale(1); }
+    100% { left: -40vw; opacity: 0; transform: scaleX(-1) scale(1.35); }
+  }
+  /* Comet tail behind the orb */
+  .proj-tail {
+    position: absolute;
+    top: 50%; left: 0;
+    width: 75%; height: 55%;
+    transform: translateY(-50%);
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 90, 20, 0.25) 25%,
+      rgba(255, 160, 50, 0.55) 55%,
+      rgba(255, 230, 140, 0.85) 80%,
+      rgba(255, 255, 240, 0.95) 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 50% 50%;
+    filter: blur(3px);
+  }
+  /* Bright burning orb at the head */
+  .proj-core {
+    position: absolute;
+    top: 50%; right: 5%;
+    width: 60%; height: 95%;
+    transform: translateY(-50%);
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(255,250,200,0.95) 18%,
+        rgba(255,200,80,0.85) 42%,
+        rgba(255,110,30,0.6) 65%,
+        transparent 85%);
+    border-radius: 50%;
+    filter: blur(1px);
+  }
+  /* Spinning energy ring around the orb */
+  .proj-spin {
+    position: absolute;
+    top: 50%; right: 18%;
+    width: 35%; height: 70%;
+    transform: translateY(-50%) rotate(0deg);
+    background:
+      radial-gradient(ellipse 100% 30% at 50% 50%,
+        rgba(255, 220, 100, 0.65) 0%,
+        rgba(255, 140, 40, 0.4) 50%,
+        transparent 80%);
+    border-radius: 50%;
+    animation: projSpin 280ms linear infinite;
+    filter: blur(0.5px);
+  }
+  @keyframes projSpin {
+    to { transform: translateY(-50%) rotate(360deg); }
+  }
+
+  /* P2-color variant (cool teal/cyan plasma instead of warm fire) */
+  .projectile.cool {
+    filter: drop-shadow(0 0 30px #4ad8ff) drop-shadow(0 0 80px #1080d0);
+  }
+  .projectile.cool .proj-tail {
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(20, 130, 230, 0.25) 25%,
+      rgba(80, 200, 255, 0.55) 55%,
+      rgba(180, 240, 255, 0.85) 80%,
+      rgba(240, 250, 255, 0.95) 100%);
+  }
+  .projectile.cool .proj-core {
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(220, 245, 255, 0.95) 18%,
+        rgba(120, 210, 255, 0.85) 42%,
+        rgba(30, 120, 220, 0.6) 65%,
+        transparent 85%);
+  }
+  .projectile.cool .proj-spin {
+    background:
+      radial-gradient(ellipse 100% 30% at 50% 50%,
+        rgba(120, 220, 255, 0.65) 0%,
+        rgba(30, 130, 220, 0.4) 50%,
+        transparent 80%);
+  }
+
+  /* ----------- IMPACT BURST (lands when projectile hits opponent side) -------- */
+  .impact-burst {
+    position: fixed;
+    top: 48%;
+    width: clamp(220px, 28vw, 460px);
+    height: clamp(220px, 28vw, 460px);
+    margin-top: calc(clamp(220px, 28vw, 460px) / -2);
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(255,240,180,0.95) 8%,
+        rgba(255,170,50,0.7) 22%,
+        rgba(255,80,20,0.5) 45%,
+        transparent 70%);
+    border-radius: 50%;
+    filter: blur(2px) drop-shadow(0 0 50px #ff7030);
+  }
+  .impact-burst.go { animation: impactPop 550ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  .impact-burst.cool {
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(220,240,255,0.95) 8%,
+        rgba(80,200,255,0.7) 22%,
+        rgba(20,100,220,0.5) 45%,
+        transparent 70%);
+    filter: blur(2px) drop-shadow(0 0 50px #4ac0ff);
+  }
+  @keyframes impactPop {
+    0%   { transform: scale(0.1) rotate(-20deg); opacity: 0; }
+    25%  { transform: scale(1.15) rotate(8deg); opacity: 1; }
+    55%  { transform: scale(1) rotate(0); opacity: 1; }
+    100% { transform: scale(1.4) rotate(0); opacity: 0; }
+  }
+
+  /* ----------- PUNCH HIT FX (one fires on every damage tick) ----------------- */
+  /* Self-centering burst (translate keeps it centered on its left/top point) */
+  .hit-burst {
+    position: fixed;
+    width: clamp(130px, 16vw, 280px);
+    height: clamp(130px, 16vw, 280px);
+    z-index: 219;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0);
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(255,240,180,0.95) 10%,
+        rgba(255,170,50,0.75) 30%,
+        rgba(255,80,20,0.5) 55%,
+        transparent 78%);
+    border-radius: 50%;
+    filter: blur(1.5px) drop-shadow(0 0 28px #ff7030);
+  }
+  .hit-burst.cool {
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(220,240,255,0.95) 10%,
+        rgba(90,200,255,0.75) 30%,
+        rgba(20,110,220,0.5) 55%,
+        transparent 78%);
+    filter: blur(1.5px) drop-shadow(0 0 28px #4ac0ff);
+  }
+  .hit-burst.go { animation: hitBurstPop 420ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  @keyframes hitBurstPop {
+    0%   { transform: translate(-50%,-50%) scale(0.1) rotate(-25deg); opacity: 0; }
+    30%  { transform: translate(-50%,-50%) scale(1.15) rotate(10deg); opacity: 1; }
+    60%  { transform: translate(-50%,-50%) scale(1)    rotate(0);     opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1.35) rotate(0);     opacity: 0; }
+  }
+  /* Comic-style hit word ("POW!", "BAM!", ...) */
+  .hit-word {
+    position: fixed;
+    z-index: 221;
+    pointer-events: none;
+    font-family: 'Bangers', 'Bowlby One', cursive;
+    font-size: clamp(38px, 5.5vw, 100px);
+    color: #fff;
+    -webkit-text-stroke: 4px #1a0a00;
+    paint-order: stroke fill;
+    letter-spacing: 0.02em;
+    text-shadow: 0 4px 0 #000, 0 0 20px rgba(255,180,40,0.9);
+    transform: translate(-50%, -50%) scale(0) rotate(-8deg);
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .hit-word.cool { text-shadow: 0 4px 0 #000, 0 0 20px rgba(90,180,255,0.9); }
+  .hit-word.go { animation: hitWordPop 560ms cubic-bezier(.2,.9,.3,1.4) forwards; }
+  @keyframes hitWordPop {
+    0%   { transform: translate(-50%,-50%) scale(0)   rotate(-12deg); opacity: 0; }
+    30%  { transform: translate(-50%,-50%) scale(1.2) rotate(6deg);   opacity: 1; }
+    65%  { transform: translate(-50%,-50%) scale(1)   rotate(-2deg);  opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1.1) rotate(0);      opacity: 0; }
+  }
+
+  /* ----------- HYPER BEAM (super move: giant beam crosses screen) ------------- */
+  .hyper-beam {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    width: 0;
+    height: clamp(140px, 22vh, 320px);
+    margin-top: calc(clamp(140px, 22vh, 320px) / -2);
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .hyper-beam.fire-p1 { animation: beamL2R 1400ms cubic-bezier(.3,.0,.7,1) forwards; }
+  .hyper-beam.fire-p2 { animation: beamR2L 1400ms cubic-bezier(.3,.0,.7,1) forwards; }
+  @keyframes beamL2R {
+    0%   { left: 0;    width: 0;     opacity: 0; }
+    12%  { left: 0;    width: 25vw;  opacity: 1; }
+    50%  { left: 0;    width: 100vw; opacity: 1; }
+    85%  { left: 0;    width: 100vw; opacity: 1; }
+    100% { left: 0;    width: 100vw; opacity: 0; }
+  }
+  @keyframes beamR2L {
+    0%   { left: 100vw; width: 0;     opacity: 0; }
+    12%  { left: 75vw;  width: 25vw;  opacity: 1; }
+    50%  { left: 0;     width: 100vw; opacity: 1; }
+    85%  { left: 0;     width: 100vw; opacity: 1; }
+    100% { left: 0;     width: 100vw; opacity: 0; }
+  }
+  .beam-glow {
+    position: absolute;
+    inset: -40% 0;
+    background: radial-gradient(ellipse 60% 100% at 50% 50%,
+      rgba(255, 240, 180, 0.55) 0%,
+      rgba(255, 140, 40, 0.35) 35%,
+      transparent 70%);
+    filter: blur(20px);
+  }
+  .beam-core {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg,
+        rgba(255, 110, 30, 0)   0%,
+        rgba(255, 180, 50, 0.7) 20%,
+        rgba(255, 240, 180, 1)  45%,
+        rgba(255, 255, 255, 1)  50%,
+        rgba(255, 240, 180, 1)  55%,
+        rgba(255, 180, 50, 0.7) 80%,
+        rgba(255, 110, 30, 0)   100%);
+    filter: blur(1.5px) drop-shadow(0 0 40px #ff8030);
+    animation: beamPulse 120ms ease-in-out infinite alternate;
+  }
+  @keyframes beamPulse {
+    from { filter: blur(1.5px) brightness(0.95) drop-shadow(0 0 30px #ff8030); }
+    to   { filter: blur(1.5px) brightness(1.15) drop-shadow(0 0 55px #ffb060); }
+  }
+  .beam-tip {
+    position: absolute;
+    top: 50%; right: -3vw;
+    width: 10vw; height: 200%;
+    transform: translateY(-50%);
+    background: radial-gradient(circle at 30% 50%,
+      rgba(255,255,255,1) 0%,
+      rgba(255,240,180,0.9) 15%,
+      rgba(255,140,40,0.6) 40%,
+      transparent 70%);
+    filter: blur(3px);
+  }
+  .hyper-beam.fire-p2 .beam-tip {
+    right: auto; left: -3vw;
+    background: radial-gradient(circle at 70% 50%,
+      rgba(255,255,255,1) 0%,
+      rgba(255,240,180,0.9) 15%,
+      rgba(255,140,40,0.6) 40%,
+      transparent 70%);
+  }
+  .hyper-beam.cool .beam-glow {
+    background: radial-gradient(ellipse 60% 100% at 50% 50%,
+      rgba(180, 230, 255, 0.55) 0%,
+      rgba(40, 140, 230, 0.35) 35%,
+      transparent 70%);
+  }
+  .hyper-beam.cool .beam-core {
+    background:
+      linear-gradient(180deg,
+        rgba(30, 120, 220, 0)   0%,
+        rgba(80, 200, 255, 0.7) 20%,
+        rgba(220, 245, 255, 1)  45%,
+        rgba(255, 255, 255, 1)  50%,
+        rgba(220, 245, 255, 1)  55%,
+        rgba(80, 200, 255, 0.7) 80%,
+        rgba(30, 120, 220, 0)   100%);
+    filter: blur(1.5px) drop-shadow(0 0 40px #50b8ff);
+  }
+  .hyper-beam.cool .beam-tip {
+    background: radial-gradient(circle at 30% 50%,
+      rgba(255,255,255,1) 0%,
+      rgba(220,245,255,0.9) 15%,
+      rgba(80,180,255,0.6) 40%,
+      transparent 70%);
+  }
+
+  /* ----------- QUAKE SUPER (ground shockwave + rising cracks) --------------- */
+  .quake-wave {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 75vh;
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 100%,
+        rgba(255, 230, 130, 0.85) 0%,
+        rgba(255, 150, 40, 0.7) 22%,
+        rgba(200, 60, 20, 0.45) 45%,
+        transparent 75%);
+    filter: blur(6px) drop-shadow(0 -10px 60px #ff8030);
+    transform-origin: center bottom;
+  }
+  .quake-wave.go { animation: quakeRise 1300ms cubic-bezier(.2,.7,.3,1) forwards; }
+  .quake-wave.cool {
+    background: radial-gradient(ellipse 90% 60% at 50% 100%,
+      rgba(120, 220, 255, 0.85) 0%,
+      rgba(40, 150, 235, 0.7) 22%,
+      rgba(20, 80, 180, 0.45) 45%,
+      transparent 75%);
+    filter: blur(6px) drop-shadow(0 -10px 60px #50b8ff);
+  }
+  @keyframes quakeRise {
+    0%   { opacity: 0; transform: scaleY(0.05) scaleX(0.3); }
+    25%  { opacity: 1; transform: scaleY(1.1) scaleX(1.1); }
+    55%  { opacity: 1; transform: scaleY(1) scaleX(1); }
+    100% { opacity: 0; transform: scaleY(1.4) scaleX(1.3); }
+  }
+  .quake-crack {
+    position: fixed;
+    bottom: 0;
+    width: 14px;
+    height: 0;
+    background: linear-gradient(to top,
+      rgba(255, 255, 220, 1) 0%,
+      rgba(255, 200, 80, 0.95) 35%,
+      rgba(255, 100, 30, 0.7) 70%,
+      transparent 100%);
+    z-index: 218;
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(1px) drop-shadow(0 0 18px #ff8030);
+    transform-origin: bottom center;
+  }
+  .quake-crack.cool {
+    background: linear-gradient(to top,
+      rgba(220, 240, 255, 1) 0%,
+      rgba(120, 210, 255, 0.95) 35%,
+      rgba(30, 130, 220, 0.7) 70%,
+      transparent 100%);
+    filter: blur(1px) drop-shadow(0 0 18px #50b8ff);
+  }
+  .quake-crack.go { animation: crackRise 800ms cubic-bezier(.2,.8,.3,1) forwards; }
+  @keyframes crackRise {
+    0%   { height: 0; opacity: 0; }
+    20%  { height: 70vh; opacity: 1; }
+    65%  { height: 75vh; opacity: 0.9; }
+    100% { height: 80vh; opacity: 0; }
+  }
+
+  /* ----------- SLASH SUPER (rapid diagonal blade marks across screen) -------- */
+  .slash-mark {
+    position: fixed;
+    top: 50%; left: 50%;
+    width: 160vw;
+    height: 14px;
+    margin-top: -7px;
+    margin-left: -80vw;
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0) 15%,
+      rgba(255, 245, 200, 0.7) 35%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 245, 200, 0.7) 65%,
+      rgba(255, 255, 255, 0) 85%,
+      transparent 100%);
+    filter: blur(2px) drop-shadow(0 0 18px #fff5a0) drop-shadow(0 0 40px #ff8030);
+    transform-origin: center center;
+  }
+  .slash-mark.cool {
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(220, 240, 255, 0) 15%,
+      rgba(180, 230, 255, 0.7) 35%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(180, 230, 255, 0.7) 65%,
+      rgba(220, 240, 255, 0) 85%,
+      transparent 100%);
+    filter: blur(2px) drop-shadow(0 0 18px #cdf2ff) drop-shadow(0 0 40px #50b8ff);
+  }
+  .slash-mark.go { animation: slashCut 380ms cubic-bezier(.4,0,.2,1) forwards; }
+  @keyframes slashCut {
+    0%   { transform: scaleX(0) rotate(var(--ang, 25deg)); opacity: 0; }
+    25%  { transform: scaleX(1) rotate(var(--ang, 25deg)); opacity: 1; }
+    75%  { transform: scaleX(1) rotate(var(--ang, 25deg)); opacity: 1; }
+    100% { transform: scaleX(1) rotate(var(--ang, 25deg)); opacity: 0; }
+  }
+
+  /* ----------- PLASMA SUPER (growing orb + ring shockwaves) ------------------ */
+  .plasma-orb {
+    position: fixed;
+    top: 48%; left: 50%;
+    width: 80px; height: 80px;
+    margin: -40px 0 0 -40px;
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(255,240,180,0.95) 18%,
+        rgba(255,150,40,0.85) 45%,
+        rgba(180,40,20,0.6) 70%,
+        transparent 100%);
+    border-radius: 50%;
+    filter: blur(2px) drop-shadow(0 0 40px #ff8030) drop-shadow(0 0 100px #ff5020);
+  }
+  .plasma-orb.cool {
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(220,245,255,0.95) 18%,
+        rgba(100,210,255,0.85) 45%,
+        rgba(20,90,200,0.6) 70%,
+        transparent 100%);
+    filter: blur(2px) drop-shadow(0 0 40px #50b8ff) drop-shadow(0 0 100px #1c80d8);
+  }
+  .plasma-orb.go { animation: plasmaGrow 1300ms cubic-bezier(.2,.7,.3,1) forwards; }
+  @keyframes plasmaGrow {
+    0%   { width: 40px; height: 40px; margin: -20px 0 0 -20px; opacity: 0; }
+    25%  { width: 220px; height: 220px; margin: -110px 0 0 -110px; opacity: 1; }
+    65%  { width: 60vmin; height: 60vmin; margin: -30vmin 0 0 -30vmin; opacity: 1; }
+    100% { width: 180vmin; height: 180vmin; margin: -90vmin 0 0 -90vmin; opacity: 0; }
+  }
+  .plasma-ring {
+    position: fixed;
+    top: 48%; left: 50%;
+    width: 100px; height: 100px;
+    margin: -50px 0 0 -50px;
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    border: 6px solid rgba(255, 230, 140, 0.85);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 25px rgba(255, 150, 40, 0.7),
+      0 0 40px rgba(255, 130, 40, 0.95),
+      0 0 90px rgba(255, 80, 20, 0.5);
+  }
+  .plasma-ring.cool {
+    border-color: rgba(180, 230, 255, 0.9);
+    box-shadow:
+      inset 0 0 25px rgba(80, 200, 255, 0.7),
+      0 0 40px rgba(80, 180, 255, 0.95),
+      0 0 90px rgba(20, 110, 220, 0.5);
+  }
+  .plasma-ring.go { animation: ringExpand 1000ms cubic-bezier(.15,.6,.3,1) forwards; }
+  @keyframes ringExpand {
+    0%   { width: 60px;  height: 60px;  margin: -30px 0 0 -30px;  opacity: 0; border-width: 8px; }
+    15%  { opacity: 1; }
+    100% { width: 220vmin; height: 220vmin; margin: -110vmin 0 0 -110vmin; opacity: 0; border-width: 1px; }
+  }
+
+  /* ----------- RUSH SUPER (rapid multi-impact bursts) ----------------------- */
+  .rush-hit {
+    position: fixed;
+    width: clamp(140px, 18vw, 280px);
+    height: clamp(140px, 18vw, 280px);
+    z-index: 217;
+    opacity: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(255,240,180,0.95) 12%,
+        rgba(255,160,50,0.8) 30%,
+        rgba(255,70,20,0.5) 55%,
+        transparent 78%);
+    border-radius: 50%;
+    filter: blur(1.5px) drop-shadow(0 0 30px #ff8030);
+    transform: translate(-50%, -50%) scale(0);
+  }
+  .rush-hit.cool {
+    background:
+      radial-gradient(circle at 50% 50%,
+        rgba(255,255,255,1) 0%,
+        rgba(220,245,255,0.95) 12%,
+        rgba(80,210,255,0.8) 30%,
+        rgba(20,100,220,0.5) 55%,
+        transparent 78%);
+    filter: blur(1.5px) drop-shadow(0 0 30px #50b8ff);
+  }
+  .rush-hit.go { animation: rushPop 420ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  @keyframes rushPop {
+    0%   { transform: translate(-50%, -50%) scale(0) rotate(-30deg); opacity: 0; }
+    35%  { transform: translate(-50%, -50%) scale(1.15) rotate(8deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.35) rotate(0); opacity: 0; }
+  }
+
+  /* ----------- SPARK FIELD (particles flying during super) ------------------- */
+  .spark-field {
+    position: fixed; inset: 0;
+    z-index: 218;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: radial-gradient(circle, #fff 0%, #ffeb73 40%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    filter: drop-shadow(0 0 6px #ff8030);
+  }
+  .spark.cool {
+    background: radial-gradient(circle, #fff 0%, #b8e8ff 40%, transparent 70%);
+    filter: drop-shadow(0 0 6px #50b8ff);
+  }
+  .spark.go { animation: sparkFly var(--dur, 900ms) ease-out forwards; }
+  @keyframes sparkFly {
+    0%   { transform: translate(0, 0) scale(0); opacity: 0; }
+    15%  { transform: translate(var(--dx, 0), var(--dy, 0)) scale(1.4); opacity: 1; }
+    100% { transform: translate(calc(var(--dx, 0) * 4), calc(var(--dy, 0) * 4)) scale(0.3); opacity: 0; }
+  }
+  /* Long motion-blur streak sparks (the After Effects-style trails) */
+  .spark-streak {
+    position: absolute;
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 200, 80, 0.4) 30%,
+      rgba(255, 255, 220, 1) 80%,
+      #fff 100%);
+    transform-origin: right center;
+    opacity: 0;
+    pointer-events: none;
+    filter: blur(0.8px) drop-shadow(0 0 8px #ff8030);
+    border-radius: 50%;
+  }
+  .spark-streak.cool {
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(80, 180, 255, 0.4) 30%,
+      rgba(220, 245, 255, 1) 80%,
+      #fff 100%);
+    filter: blur(0.8px) drop-shadow(0 0 8px #50b8ff);
+  }
+  .spark-streak.go { animation: streakFly var(--dur, 700ms) cubic-bezier(.2,.7,.4,1) forwards; }
+  @keyframes streakFly {
+    0%   { transform: translate(0,0) rotate(var(--ang, 0deg)) scaleX(0); opacity: 0; }
+    20%  { transform: translate(0,0) rotate(var(--ang, 0deg)) scaleX(1); opacity: 1; }
+    100% { transform: translate(var(--dx, 0), var(--dy, 0)) rotate(var(--ang, 0deg)) scaleX(0.4); opacity: 0; }
+  }
+  /* Tiny twinkles that linger longer */
+  .twinkle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: #fff;
+    box-shadow: 0 0 6px #fff, 0 0 18px rgba(255, 220, 120, 0.9);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .twinkle.cool { box-shadow: 0 0 6px #fff, 0 0 18px rgba(120, 210, 255, 0.9); }
+  .twinkle.go { animation: twinkleLife 1300ms ease-in-out forwards; }
+  @keyframes twinkleLife {
+    0%   { transform: scale(0); opacity: 0; }
+    20%  { transform: scale(1.4); opacity: 1; }
+    50%  { transform: scale(1); opacity: 0.95; }
+    100% { transform: scale(0.6); opacity: 0; }
+  }
+
+  /* ----------- HIT COUNTER ("8 HITS!" style) --------------------------------- */
+  .hit-counter {
+    position: absolute;
+    top: 58%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 222;
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    color: #fff;
+    line-height: 0.85;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    display: flex; align-items: baseline; gap: 0.15em;
+    transform-origin: center center;
+  }
+  .hit-num {
+    font-size: clamp(60px, 9vw, 150px);
+    color: #ffeb73;
+    -webkit-text-stroke: 4px #2a0a00;
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 15px rgba(255, 180, 40, 0.95),
+      0 0 40px rgba(255, 100, 20, 0.7),
+      0 6px 0 #4a1500;
+    display: inline-block;
+    transform: skewX(-10deg);
+  }
+  .hit-label {
+    font-size: clamp(30px, 4.5vw, 70px);
+    color: #ff5a3c;
+    -webkit-text-stroke: 3px #2a0a00;
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 10px rgba(255, 80, 40, 0.95),
+      0 4px 0 #2a0500;
+    display: inline-block;
+    transform: skewX(-10deg);
+  }
+  .hit-counter.show { animation: hitCounterPop 950ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  @keyframes hitCounterPop {
+    0%   { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 0; }
+    20%  { transform: translate(-50%, -50%) scale(1.25) rotate(4deg); opacity: 1; }
+    55%  { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.4) rotate(0); opacity: 0; }
+  }
+
+  .fight-fx {
+    position: fixed; inset: 0;
+    z-index: 215;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .fx-streak {
+    position: absolute;
+    top: 30%; left: -50%;
+    width: 200%;
+    height: 25%;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 240, 180, 0) 10%,
+      rgba(255, 240, 180, 0.55) 45%,
+      rgba(255, 200, 80, 0.85) 50%,
+      rgba(255, 240, 180, 0.55) 55%,
+      transparent 90%);
+    opacity: 0;
+    mix-blend-mode: screen;
+    filter: blur(2px);
+  }
+  .fx-streak.go { animation: streakSweep 850ms cubic-bezier(.4,.1,.2,1) forwards; }
+  @keyframes streakSweep {
+    0%   { transform: translateX(-30%) skewX(-22deg); opacity: 0; }
+    25%  { opacity: 1; }
+    100% { transform: translateX(60%) skewX(-22deg); opacity: 0; }
+  }
+
+  .fx-text {
+    position: absolute;
+    top: 38%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-family: 'Bowlby One', 'Impact', sans-serif;
+    font-size: clamp(48px, 10vw, 180px);
+    color: #fff5a0;
+    -webkit-text-stroke: 5px #1a0000;
+    paint-order: stroke fill;
+    letter-spacing: -0.01em;
+    line-height: 0.9;
+    white-space: nowrap;
+    text-shadow:
+      0 0 18px rgba(255, 180, 40, 0.95),
+      0 0 50px rgba(255, 110, 30, 0.8),
+      0 8px 0 #4a1500;
+    opacity: 0;
+    z-index: 220;
+  }
+  .fx-text.show { animation: fxBurst 1100ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  .fx-text.p2-color {
+    color: #cdf2ff;
+    text-shadow:
+      0 0 18px rgba(80, 180, 255, 0.95),
+      0 0 50px rgba(30, 130, 255, 0.8),
+      0 8px 0 #04263d;
+  }
+  /* Red "K.O.!" treatment used when a teammate falls mid-match */
+  .fx-text.ko-color {
+    color: #ff4a3a;
+    -webkit-text-stroke: 6px #ffffff;
+    text-shadow:
+      0 0 22px rgba(255, 70, 50, 0.98),
+      0 0 60px rgba(255, 30, 20, 0.85),
+      0 0 120px rgba(200, 10, 10, 0.6),
+      0 10px 0 #3a0000;
+    letter-spacing: 0.04em;
+  }
+  @keyframes fxBurst {
+    0%   { transform: translate(-50%, -50%) scale(0)   rotate(-14deg); opacity: 0; }
+    18%  { transform: translate(-50%, -50%) scale(1.25) rotate(3deg);  opacity: 1; }
+    55%  { transform: translate(-50%, -50%) scale(1)    rotate(-1deg); opacity: 1; }
+    80%  { transform: translate(-50%, -50%) scale(1)    rotate(0);     opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5)  rotate(0);     opacity: 0; }
+  }
+
+  .fight-ko {
+    position: fixed;
+    top: 58%; left: 50%;     /* sits below the top HUD so the HP bars stay readable */
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 230;
+    pointer-events: none;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(80px, 14vw, 240px);
+    color: #ff3a3a;
+    -webkit-text-stroke: 6px #fff;
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 30px rgba(255, 60, 60, 0.95),
+      0 0 80px rgba(255, 30, 30, 0.75),
+      0 10px 0 #2a0000;
+    opacity: 0;
+    letter-spacing: 0.04em;
+  }
+  /* Win banner can be a long string ("AARON AND KENG I WINS!") — shrink it,
+     cap the width and allow wrapping so it stays inside the frame. */
+  .fight-ko.wins {
+    font-size: clamp(40px, 7vw, 116px);
+    -webkit-text-stroke: 4px #fff;
+    letter-spacing: 0.02em;
+    line-height: 0.98;
+    max-width: 92vw;
+    white-space: normal;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .fight-ko.show { animation: koPop 1400ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  @keyframes koPop {
+    0%   { transform: translate(-50%, -50%) scale(2.5) rotate(-12deg); opacity: 0; }
+    20%  { transform: translate(-50%, -50%) scale(0.9) rotate(4deg);   opacity: 1; }
+    50%  { transform: translate(-50%, -50%) scale(1)   rotate(0);      opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1)   rotate(0);      opacity: 1; }
+  }
+
+  /* Round-start countdown: 3 / 2 / 1 / GO, big center text */
+  .fight-count {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    z-index: 235;
+    pointer-events: none;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(120px, 22vw, 380px);
+    color: #ffd23c;
+    -webkit-text-stroke: 7px #fff;
+    paint-order: stroke fill;
+    text-shadow:
+      0 0 40px rgba(255, 200, 40, 0.95),
+      0 0 90px rgba(255, 150, 0, 0.7),
+      0 12px 0 #3a1c00;
+    opacity: 0;
+    letter-spacing: 0.03em;
+  }
+  .fight-count.go {
+    color: #46e86b;
+    text-shadow:
+      0 0 40px rgba(70, 232, 107, 0.95),
+      0 0 90px rgba(0, 200, 80, 0.7),
+      0 12px 0 #06330f;
+  }
+  .fight-count.tick { animation: countPop 900ms cubic-bezier(.2,.85,.25,1.3) forwards; }
+  @keyframes countPop {
+    0%   { transform: translate(-50%, -50%) scale(2.4); opacity: 0; }
+    18%  { transform: translate(-50%, -50%) scale(0.92); opacity: 1; }
+    45%  { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+    80%  { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; }
+  }
+
+  /* Ulti video — full-screen takeover when M2's ultimate triggers */
+  .ulti-video {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 245;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease;
+  }
+  .ulti-video.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ----------- ALPHA-WEBM EFFECT OVERLAYS (from the anime FX pack) ----------- */
+  /* All are transparent VP9 clips; no blend mode needed. Hidden until .playing. */
+  .fx-video {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0;
+  }
+  .fx-video.playing { opacity: 1; }
+
+  /* Per-punch hit burst — ~38vw, centered on a point set inline by JS */
+  .fx-hit {
+    width: 38vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 219;
+    filter: drop-shadow(0 0 24px rgba(255,200,120,0.5));
+  }
+  /* Fireball explosion at the impact point */
+  .fx-fire {
+    width: 46vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 218;
+    filter: drop-shadow(0 0 40px rgba(255,150,60,0.6));
+  }
+  /* K.O. splat fills the screen, sits BEHIND the .fight-ko text (z=230) */
+  .fx-ko {
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 225;
+  }
+  /* Expanding shockwave (centered on its left/top point). screen blend so
+     the bright energy adds into the scene rather than sitting flatly. */
+  .fx-shock {
+    width: 90vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 222;
+    mix-blend-mode: screen;
+  }
+  /* Lightsaber-duel residue: bright energy clips on black, added via screen
+     blend. Width/position are set per-cue by playFxVideo. */
+  .fx-saber {
+    width: 40vw;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 223;
+    mix-blend-mode: screen;
+    filter: drop-shadow(0 0 26px rgba(120, 200, 255, 0.45));
+  }
+
+  /* Punch impact — sharp white flash, centered on a block column */
+  .fx-punch {
+    width: clamp(180px, 22vw, 380px);
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 221;
+    mix-blend-mode: screen;
+  }
+  /* Block — crystalline clash, cool/contained, centered on a block column */
+  .fx-block {
+    width: clamp(170px, 20vw, 340px);
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: 221;
+    filter: drop-shadow(0 0 18px rgba(180,210,255,0.7));
+  }
+
+  /* Whiff — a fast motion-swipe for a missed punch (no impact, no damage) */
+  .whiff {
+    position: fixed;
+    width: clamp(160px, 18vw, 300px);
+    height: clamp(40px, 5vw, 80px);
+    transform: translate(-50%, -50%) rotate(-18deg) scaleX(0);
+    z-index: 221;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(90deg,
+      transparent 0%, rgba(255,255,255,0.05) 20%,
+      rgba(255,255,255,0.55) 55%, rgba(255,255,255,0.95) 80%, transparent 100%);
+    border-radius: 50%;
+    filter: blur(3px);
+    mix-blend-mode: screen;
+  }
+  .whiff.go { animation: whiffSwipe 360ms cubic-bezier(.3,.1,.2,1) forwards; }
+  @keyframes whiffSwipe {
+    0%   { transform: translate(-50%,-50%) rotate(-18deg) scaleX(0)   translateX(-30px); opacity: 0; }
+    25%  { opacity: 0.9; }
+    100% { transform: translate(-50%,-50%) rotate(-18deg) scaleX(1.2) translateX(40px);  opacity: 0; }
+  }
+
+  /* ----------- CHALLENGER APPROACHING screen ----------------------- */
+  .challenger {
+    position: fixed;
+    inset: 0;
+    z-index: 250;          /* full takeover, above everything */
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+  }
+  .challenger.show { opacity: 1; pointer-events: auto; }
+  .challenger-vid {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    display: block;
+  }
+  /* The entering character's face, sat over the white burst on the right */
+  .challenger-face {
+    position: absolute;
+    left: 62%;            /* burst center, right-of-middle */
+    top: 44%;
+    transform: translate(-50%, -50%) scale(0.2);
+    width: clamp(220px, 30vw, 460px);
+    height: clamp(260px, 36vw, 560px);
+    background-size: cover;
+    background-position: center 20%;
+    background-repeat: no-repeat;
+    border-radius: 16px;
+    box-shadow: 0 0 40px rgba(255,255,255,0.9), 0 0 90px rgba(255,160,160,0.7);
+    /* soft-feather the edges so the face melts into the white burst */
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 55%, transparent 82%);
+            mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, #000 55%, transparent 82%);
+    opacity: 0;
+  }
+  .challenger.show .challenger-face {
+    animation: challengerFacePop 600ms cubic-bezier(.2,.85,.25,1.3) forwards;
+    animation-delay: 120ms;
+  }
+  @keyframes challengerFacePop {
+    0%   { transform: translate(-50%,-50%) scale(0.2) rotate(-6deg); opacity: 0; }
+    35%  { transform: translate(-50%,-50%) scale(1.08) rotate(2deg); opacity: 1; }
+    70%  { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; }
+  }
+
+  .fight-screen.shake { animation: screenShake 250ms ease-in-out; }
+  @keyframes screenShake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-6px, 3px); }
+    40% { transform: translate(5px, -4px); }
+    60% { transform: translate(-4px, 5px); }
+    80% { transform: translate(6px, -2px); }
+  }
+
+  /* Audio prompt - shown if browser blocks autoplay */
+  .audio-prompt {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 20, 50, 0.92);
+    border: 2px solid #66c8ff;
+    box-shadow: 0 0 40px rgba(102, 200, 255, 0.6);
+    color: #fff;
+    padding: 24px 36px;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(16px, 1.6vw, 24px);
+    letter-spacing: 0.1em;
+    text-align: center;
+    z-index: 300;
+    cursor: pointer;
+    transition: opacity 300ms ease;
+  }
+  .audio-prompt.hidden { opacity: 0; pointer-events: none; }
+  .audio-prompt small {
+    display: block;
+    font-family: 'Russo One', sans-serif;
+    font-size: 0.55em;
+    letter-spacing: 0.18em;
+    margin-top: 8px;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <!-- Starry sky -->
+  <div class="starfield"></div>
+
+  <!-- Top and bottom globe arcs (the curved cyan rims) -->
+  <div class="arc top"></div>
+  <div class="arc bottom"></div>
+
+  <!-- Warped sphere meridian/parallel grid -->
+  <svg class="sphere-grid" id="sphereGrid" viewBox="-100 -100 200 200" preserveAspectRatio="xMidYMid meet"></svg>
+
+  <!-- TIME / infinity at top -->
+  <div class="time-counter">
+    <div class="time-label" id="timeLabel">TIME</div>
+    <div class="time-infinity">&#8734;</div>
+  </div>
+
+  <!-- LEFT preview panel: Player 1 -->
+  <div class="preview p1" id="preview-p1">
+    <div class="cover" id="cover-p1">
+      <div class="cover-burst"></div>
+      <div class="cover-characters empty" id="characters-p1"></div>
+      <div class="cover-hover-badge">PREVIEW</div>
+      <div class="cover-shade"></div>
+      <div class="spine" id="spine-p1"></div>
+      <div class="logo-block" id="logo-p1"></div>
+      <div class="player-flag" id="flag-p1">PLAYER 1</div>
+
+      <div class="stack" id="stack-p1"></div>
+      <div class="big-name empty" id="big-name-p1">SELECT</div>
+
+      <div class="barcode">
+        <div class="barcode-bars"></div>
+        <div class="barcode-num">0 71486 03104 2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- The 3x3 character grid + cursors -->
+  <div class="grid-wrapper">
+    <div class="grid" id="grid"></div>
+    <div class="cursor p1" id="cursor-p1"><div class="cursor-box"></div><div class="cursor-label">P1</div></div>
+    <div class="cursor p2" id="cursor-p2"><div class="cursor-box"></div><div class="cursor-label">P2</div></div>
+  </div>
+
+  <!-- RIGHT preview panel: Player 2 -->
+  <div class="preview p2" id="preview-p2">
+    <div class="cover" id="cover-p2">
+      <div class="cover-burst"></div>
+      <div class="cover-characters empty" id="characters-p2"></div>
+      <div class="cover-hover-badge">PREVIEW</div>
+      <div class="cover-shade"></div>
+      <div class="spine" id="spine-p2"></div>
+      <div class="logo-block" id="logo-p2"></div>
+      <div class="player-flag" id="flag-p2">PLAYER 2</div>
+
+      <div class="stack" id="stack-p2"></div>
+      <div class="big-name empty" id="big-name-p2">SELECT</div>
+
+      <div class="barcode">
+        <div class="barcode-bars"></div>
+        <div class="barcode-num">0 71486 03104 2</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-select" id="heroSelect">HERO SELECT</div>
+  <div class="hint" id="hint"></div>
+
+  <!-- Background music. src is set from BGM_PATH in JS. -->
+  <!-- BGM A: MvC3 select theme; plays during the 'selecting' phase -->
+  <audio id="bgmSelect" loop preload="auto"></audio>
+  <!-- BGM B: show music; takes over at the VS screen -->
+  <audio id="bgmShow" preload="auto"></audio>
+  <!-- Compatibility alias used by the older code paths -->
+  <audio id="bgmAudio" loop preload="auto"></audio>
+</div>
+
+<!-- ============================================================ -->
+<!-- VS SCREEN OVERLAY                                            -->
+<!-- ============================================================ -->
+<div class="vs-flash" id="vsFlash"></div>
+<div class="vs-screen" id="vsScreen">
+  <div class="starfield"></div>
+  <div class="arc top"></div>
+  <div class="arc bottom"></div>
+  <svg class="sphere-grid" viewBox="-100 -100 200 200" preserveAspectRatio="xMidYMid meet" id="vsGrid"></svg>
+
+  <!-- Confirm-transition layers: rays + bright central burst -->
+  <div class="vs-rays"></div>
+  <div class="vs-white-burst"></div>
+
+  <div class="vs-side p1">
+    <div class="vs-side-label" id="vsLabel-p1">PLAYER 1</div>
+    <div class="vs-portraits" id="vs-portraits-p1"></div>
+  </div>
+  <div class="vs-center">
+    <div class="vs-shock"></div>
+    VS
+  </div>
+  <div class="vs-side p2">
+    <div class="vs-side-label" id="vsLabel-p2">PLAYER 2</div>
+    <div class="vs-portraits" id="vs-portraits-p2"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FIGHT SCREEN (post-VS gameplay HUD)                          -->
+<!-- ============================================================ -->
+<div class="fight-screen" id="fightScreen">
+  <div class="starfield"></div>
+
+  <!-- TIME label at top center -->
+  <div class="fight-time-wrap">
+    <div class="fight-time-label">TIME</div>
+    <div class="fight-time" id="fightTime">&#8734;</div>
+  </div>
+
+  <!-- P1 HUD (top-left) -->
+  <div class="fight-hud p1">
+    <div class="fight-portrait" id="fightPortrait-p1"></div>
+    <div class="fight-bars">
+      <div class="hp-track">
+        <div class="hp-fill" id="hpFill-p1"></div>
+        <div class="hp-name" id="fightName-p1">P1</div>
+      </div>
+      <div class="reserve-list" id="reserve-p1"></div>
+    </div>
+  </div>
+
+  <!-- P2 HUD (top-right, mirrored) -->
+  <div class="fight-hud p2">
+    <div class="fight-bars">
+      <div class="hp-track right">
+        <div class="hp-fill" id="hpFill-p2"></div>
+        <div class="hp-name" id="fightName-p2">P2</div>
+      </div>
+      <div class="reserve-list right" id="reserve-p2"></div>
+    </div>
+    <div class="fight-portrait" id="fightPortrait-p2"></div>
+  </div>
+
+  <!-- FX overlays -->
+  <div class="fight-dim" id="fightDim"></div>
+  <div class="fight-flash" id="fightFlash"></div>
+
+  <!-- Projectile (medium attack) — flies across the screen -->
+  <div class="projectile" id="projectile">
+    <div class="proj-tail"></div>
+    <div class="proj-core"></div>
+    <div class="proj-spin"></div>
+  </div>
+
+  <!-- Hyper beam (super move) — giant beam crosses entire screen -->
+  <div class="hyper-beam" id="hyperBeam">
+    <div class="beam-glow"></div>
+    <div class="beam-core"></div>
+    <div class="beam-tip"></div>
+  </div>
+
+  <!-- Quake wave (ground shockwave super) -->
+  <div class="quake-wave" id="quakeWave"></div>
+  <!-- Crack pillars get appended into here dynamically -->
+  <div id="quakeCracks" style="position:fixed;inset:0;z-index:218;pointer-events:none;"></div>
+
+  <!-- Slash super: container for multiple slash marks -->
+  <div id="slashField" style="position:fixed;inset:0;z-index:217;pointer-events:none;"></div>
+
+  <!-- Plasma super: growing orb + expanding rings -->
+  <div class="plasma-orb" id="plasmaOrb"></div>
+  <div id="plasmaRings" style="position:fixed;inset:0;z-index:217;pointer-events:none;"></div>
+
+  <!-- Rush super: many rapid impact bursts -->
+  <div id="rushField" style="position:fixed;inset:0;z-index:217;pointer-events:none;"></div>
+
+  <!-- Impact burst at end of projectile travel -->
+  <div class="impact-burst" id="impactBurst"></div>
+
+  <!-- Sparks/particles for super -->
+  <div class="spark-field" id="sparkField"></div>
+
+  <div class="fight-fx" id="fightFx">
+    <div class="fx-text" id="fxText"></div>
+    <div class="fx-streak" id="fxStreak"></div>
+    <div class="hit-counter" id="hitCounter">
+      <span class="hit-num" id="hitNum">0</span>
+      <span class="hit-label">HITS!</span>
+    </div>
+  </div>
+  <!-- KO video plays full-screen BEHIND the K.O. text (z below .fight-ko=230) -->
+  <video class="fx-video fx-ko" id="koVideo" muted playsinline preload="auto" src="ko.webm"></video>
+  <div class="fight-ko" id="fightKO"></div>
+
+  <!-- Round-start countdown (3 / 2 / 1 / GO) -->
+  <div class="fight-count" id="fightCount"></div>
+
+  <!-- Per-hit anime bursts: positioned over the struck fighter's side -->
+  <video class="fx-video fx-hit" id="hitWarm" muted playsinline preload="auto" src="hit-warm.webm"></video>
+  <video class="fx-video fx-hit" id="hitCool" muted playsinline preload="auto" src="hit-cool.webm"></video>
+  <!-- Punch impact (sharp white flash) + block (crystalline clash), positioned by block column -->
+  <video class="fx-video fx-punch" id="punchFx" muted playsinline preload="auto" src="punch.webm"></video>
+  <video class="fx-video fx-block" id="blockFx" muted playsinline preload="auto" src="block.webm"></video>
+  <!-- Whiff streak for a missed punch -->
+  <div class="whiff" id="whiffFx"></div>
+  <!-- Big fire explosion for the weapon-shot (fireball) impacts -->
+  <video class="fx-video fx-fire" id="fireImpact" muted playsinline preload="auto" src="impact-fire.webm"></video>
+
+  <!-- Shockwaves: cyan flash-burst for impacts, big orange wave for the KO climax -->
+  <video class="fx-video fx-shock" id="shockCool" muted playsinline preload="auto" src="shock-cool.webm"></video>
+  <video class="fx-video fx-shock" id="shockWarm" muted playsinline preload="auto" src="shock-warm.webm"></video>
+
+  <!-- Lightsaber-duel "residue" overlays (bright energy on black -> screen blend) -->
+  <video class="fx-video fx-saber" id="fxKick"     muted playsinline preload="auto" src="fx-kick.webm"></video>
+  <video class="fx-video fx-saber" id="fxSaberOn"  muted playsinline preload="auto" src="fx-saberon.webm"></video>
+  <video class="fx-video fx-saber" id="fxSwipe"    muted playsinline preload="auto" src="fx-swipe.webm"></video>
+  <video class="fx-video fx-saber" id="fxSaberHit" muted playsinline preload="auto" src="fx-saberhit.webm"></video>
+  <video class="fx-video fx-saber" id="fxPierce"   muted playsinline preload="auto" src="fx-pierce.webm"></video>
+
+  <!-- Ultimate move video (M2's ULTI). Hidden until triggered by the choreography. -->
+  <video class="ulti-video" id="ultiVideo" preload="auto" playsinline></video>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHALLENGER APPROACHING screen (plays on a character entrance) -->
+<!-- ============================================================ -->
+<div class="challenger" id="challenger">
+  <video class="challenger-vid" id="challengerVid" playsinline preload="auto" src="challenger.mp4"></video>
+  <div class="challenger-face" id="challengerFace"></div>
+</div>
+
+<script>
+/* ==================================================================
+   ====================  EASY-EDIT CONFIG  ==========================
+   ================================================================== */
+
+// How many characters each player picks before the VS screen triggers.
+const SELECTIONS_PER_PLAYER = 2;
+
+// --------------------------------------------------------------
+//   TEXT - all on-screen text labels. Edit any of these freely.
+// --------------------------------------------------------------
+const TEXT = {
+  // Big title shown on the comic-book covers (top banner)
+  brandMain:     "CHALLENGER'S",
+  brandSeparator:"SPECIAL",
+  brandTail:     "NIGHT",
+  brandSub:      "Tonight's Showdown",
+
+  // Vertical spine of the comic book (book binder)
+  spine:         "CHALLENGER'S SPECIAL NIGHT — Tonight's Showdown",
+
+  // Bottom-center heading
+  heroSelect:    "HERO SELECT",
+
+  // Top-center label above the infinity sign
+  timeLabel:     "TIME",
+
+  // Player labels (cover flag + VS screen heading)
+  player1:       "PLAYER 1",
+  player2:       "PLAYER 2",
+
+  // Bottom hint line
+  hint:          "P: START   O: STOP   R: RESET   |   JUMP: 1 TOP · 2 CHORUS · 3 FIREBALLS · 4 ULTI   |   MANUAL P1 A/D Q/E   P2 ←/→ [/]",
+};
+
+// --------------------------------------------------------------
+//   CHARACTERS  (9 total in a 3x3 grid)
+// --------------------------------------------------------------
+//   To replace a portrait with your own face photo:
+//     1. Drop your image file next to this HTML file
+//     2. Set `image` to that filename, e.g.  image: 'joel.jpg'
+//        Web URLs also work, e.g.  image: 'https://example.com/me.png'
+//     3. Set `name` to whatever label you want on the portrait
+//     4. Save and reload. Done.
+//
+//   Leaving `image: null` shows an auto-generated colored placeholder.
+// --------------------------------------------------------------
+const CHARACTERS = [
+  /* row 0 */
+  { name: 'AARON',      image: 'aaron.png' },
+  { name: 'JWONG',      image: 'jwong.png' },
+  { name: 'ANDREW',     image: 'andrew.png' },
+  /* row 1 */
+  { name: 'MATT',       image: 'matthew.png' },
+  { name: 'KENG I',     image: 'kengi.png' },
+  { name: 'MARKUS',     image: 'markus.png' },
+  /* row 2 */
+  { name: 'KIAN HWEE',  image: 'kianhwee.png' },
+  { name: 'BRAYDON',    image: 'braydon.png' },
+  { name: 'JOEL',       image: 'joel.png' },
+];
+// Grid layout (3x3, idx left->right, top->bottom):
+//   row 0:  AARON(0)   JWONG(1)   ANDREW(2)
+//   row 1:  MATT(3)    KENG I(4)  MARKUS(5)
+//   row 2:  KIAN HWEE(6)  BRAYDON(7) JOEL(8)
+// Show team picks:
+//   P1 = M team: AARON (M1)   + KENG I  (M2)
+//   P2 = R team: BRAYDON (R1) + MARKUS (R2, the "weapon" character)
+
+const GRID_COLS = 3;
+const GRID_ROWS = 3;
+
+// Background music volume (0 silent .. 1 loud).
+const BGM_VOLUME = 0.45;
+
+// Path to your background music file. Relative to this HTML file.
+// (Drop the mp3 next to this file and just use the filename, or use a
+//  path like 'Downloads/song.mp3' relative to the HTML's folder.)
+// BGM A: select-phase music (the MvC3 character-select theme).
+// BGM B: show music, takes over starting at the VS screen.
+const SELECT_BGM_PATH = 'Super Smash Bros. Ultimate Character Select Theme.mp3';
+const SHOW_BGM_PATH   = 'Special night REAL.mp3';
+// Where in the show-track to start playing once VS triggers (seconds).
+// Chorus drops at 35s, so we start at 30s so VS plays 30s..35s then the
+// fight begins exactly on the chorus downbeat.
+const SHOW_BGM_START_TIME = 0;
+// Seconds of VS screen before the fight begins. Together with
+// SHOW_BGM_START_TIME this determines the chorus alignment:
+//   fight starts at (SHOW_BGM_START_TIME + VS_TO_FIGHT_DELAY) = 35s
+const VS_TO_FIGHT_DELAY = 5;
+// Splice target inside the show track (seconds) — where to jump after the
+// weapon-shot sequence, so the ulti plays during the bridge/build-up.
+// 1:43 (= 103s) is the moment to cut into; the ulti video kicks off at
+// 1:04 (= 64s).
+const SHOW_BGM_SPLICE_TARGET = 103;
+const SHOW_BGM_ULTI_TIME     = 64;
+// Back-compat: a few older code paths still read BGM_PATH.
+const BGM_PATH = SHOW_BGM_PATH;
+// Video used for the M2 ultimate animation
+const ULT_VIDEO_PATH = 'ulti.mp4';
+
+/* ==================================================================
+   ============  SHOW CHOREOGRAPHY  ==================================
+   ==================================================================
+   Press 'P' to start the show. The selection phase plays the MvC3
+   select theme; cues in SELECT_CUES are timed from when P was pressed
+   (wall-clock seconds). Once both players have picked and the VS
+   advances, music switches to the show track and SHOW_CUES start
+   firing against bgmShow.currentTime (NSYNC absolute seconds).
+
+   Cue types:
+     cursor   - move a player's grid cursor to {row, col}
+     pick     - that player confirms whatever cell their cursor is on
+     enter    - global Enter (advances selecting -> vs -> fighting)
+     damage   - apply exact HP to {side} (auto-swap on KO)
+     fireball - run the medium-attack projectile from {side}
+                NOTE: projectile flight is ~1280ms, so fire at
+                (impact_time - 1.28) to land on the beat.
+     splice   - jump the show track to {to} seconds
+     ulti     - play the ulti video full-screen
+     count    - big center round text {text}: '3'/'2'/'1'/'GO'
+     fx       - play a named effect webm {id} at {left,top,width}
+     challenger - "A new foe appeared" takeover for CHARACTERS[{idx}]
+================================================================== */
+
+// ---- SELECT phase cues (wall-clock seconds from P press) ----
+const SELECT_CUES = [
+  // P1 scrolls then lands on AARON (M1) at (0,0). P1 cursor starts at
+  // (0,0) so we wander around the grid first for slot-machine drama
+  // before settling back on AARON.
+  { t:  4.0, do: 'cursor', side: 'p1', row: 0, col: 1 }, // JWONG
+  { t:  4.7, do: 'cursor', side: 'p1', row: 0, col: 2 }, // ANDREW
+  { t:  5.4, do: 'cursor', side: 'p1', row: 1, col: 2 }, // MARKUS
+  { t:  6.1, do: 'cursor', side: 'p1', row: 1, col: 1 }, // KENG I
+  { t:  6.8, do: 'cursor', side: 'p1', row: 1, col: 0 }, // MATT
+  { t:  7.5, do: 'cursor', side: 'p1', row: 0, col: 0 }, // back on AARON
+  { t:  9.0, do: 'pick',   side: 'p1' },
+
+  // P2 scrolls then lands on BRAYDON (R1) at (2,1). P2 cursor starts
+  // at (2,2)=JOEL.
+  { t: 12.0, do: 'cursor', side: 'p2', row: 2, col: 0 }, // KIAN HWEE
+  { t: 12.7, do: 'cursor', side: 'p2', row: 1, col: 0 }, // MATT
+  { t: 13.4, do: 'cursor', side: 'p2', row: 1, col: 1 }, // KENG I (P1-locked)
+  { t: 14.1, do: 'cursor', side: 'p2', row: 1, col: 2 }, // MARKUS
+  { t: 14.8, do: 'cursor', side: 'p2', row: 2, col: 2 }, // JOEL
+  { t: 15.5, do: 'cursor', side: 'p2', row: 2, col: 1 }, // lands on BRAYDON
+  { t: 16.5, do: 'pick',   side: 'p2' },
+
+  // P1 picks KENG I (M2) at (1,1)
+  { t: 20.0, do: 'cursor', side: 'p1', row: 0, col: 1 }, // JWONG
+  { t: 20.7, do: 'cursor', side: 'p1', row: 0, col: 2 }, // ANDREW
+  { t: 21.4, do: 'cursor', side: 'p1', row: 1, col: 1 }, // lands on KENG I
+  { t: 23.5, do: 'pick',   side: 'p1' },
+
+  // P2 picks MARKUS (R2 - the "weapon" character) at (1,2)
+  { t: 27.0, do: 'cursor', side: 'p2', row: 2, col: 2 }, // JOEL
+  { t: 27.7, do: 'cursor', side: 'p2', row: 1, col: 2 }, // lands on MARKUS
+  { t: 30.0, do: 'pick',   side: 'p2' },
+
+  // Advance into VS (triggers automatic music swap to show track)
+  { t: 33.5, do: 'enter' },
+];
+
+// ---- SHOW phase cues (timed off bgmShow.currentTime, i.e. show-track seconds) ----
+// The show track begins playing at SHOW_BGM_START_TIME when VS triggers,
+// so any cue with t < SHOW_BGM_START_TIME never fires.
+const SHOW_CUES = [
+  // Advance into the fight VS_TO_FIGHT_DELAY seconds after VS appears.
+  // (Linked to the constant so retuning the start time keeps the VS length stable.)
+  { t: SHOW_BGM_START_TIME + VS_TO_FIGHT_DELAY, do: 'enter' },
+
+  // Round-start countdown over the fresh fight screen: 3 / 2 / 1 / GO
+  { t: 5, do: 'count', text: '3' },
+  { t: 6, do: 'count', text: '2' },
+  { t: 7, do: 'count', text: '1' },
+  { t: 8, do: 'count', text: 'GO' },
+
+  // First round (0:13 -> 0:20, absolute show-track seconds). The action
+  // sweeps right-to-left as BRAYDON (R1, p2) gets driven back across the
+  // 10 screen columns (block N center = (N*10-5)vw): 6 -> 5 -> 4 -> 3 -> 2.
+  // Cue types: block (clash fx, no dmg) | miss (whiff, no dmg) | hit (punch + dmg)
+  { t: 13.0, do: 'block', block: 6 },                       // BRAYDON blocks
+  { t: 14.0, do: 'hit',   block: 6, side: 'p2', amount: 20 }, // hit lands
+  { t: 15.0, do: 'hit',   block: 5, side: 'p2', amount: 20 },
+  { t: 16.0, do: 'miss',  block: 4 },                       // whiff
+  { t: 18.0, do: 'miss',  block: 3 },                       // whiff
+  { t: 19.0, do: 'hit',   block: 2, side: 'p2', amount: 20 }, // 3 consecutive
+  { t: 19.5, do: 'hit',   block: 2, side: 'p2', amount: 20 },
+  { t: 20.0, do: 'hit',   block: 2, side: 'p2', amount: 100 }, // KO -> MARKUS swaps in
+
+  // 0:30 — "A NEW FOE APPEARED": MARKUS (idx 5) Challenger-Approaching
+  // takeover (2.5s, plays the challenger jingle) before the duel.
+  { t: 30.0, do: 'challenger', idx: 5 },
+
+  // === LIGHTSABER DUEL — timed to "Special night REAL.mp3" (88s) =====
+  // The saber blade is live in the room; these cues lay the on-screen
+  // "residue" (screen-blend energy webms) over the fight scene. Action
+  // centers on AARON (p1, left ~30vw); the attacker works from the right.
+  // Each fx cue's left/top/width is independently tunable.
+  { t: 34.0,  do: 'fx', id: 'fxKick',     left: '44vw', top: '54%', width: '40vw' }, // 0:34 wushu kick connects
+  { t: 35.0,  do: 'fx', id: 'fxSaberOn',  left: '60vw', top: '46%', width: '38vw' }, // 0:35 lightsaber ignites
+  { t: 41.0,  do: 'fx', id: 'fxSwipe',    left: '38vw', top: '50%', width: '50vw' }, // 0:41 AARON dodges the swing
+  { t: 45.0,  do: 'fx', id: 'fxSaberHit', left: '31vw', top: '50%', width: '34vw' }, // 0:45 first hit
+  { t: 45.0,  do: 'damage', side: 'p1', amount: 22 },
+  { t: 45.4,  do: 'fx', id: 'fxSaberHit', left: '34vw', top: '45%', width: '32vw' }, // 0:45.4 second hit
+  { t: 45.4,  do: 'damage', side: 'p1', amount: 22 },
+  { t: 48.0,  do: 'fx', id: 'fxPierce',   left: '29vw', top: '50%', width: '46vw' }, // 0:48 saber pierces through AARON
+  { t: 48.0,  do: 'damage', side: 'p1', amount: 100 },                                // AARON down -> KENG I swaps in
+
+  // 0:54 — "A NEW FOE APPEARED": KENG I (idx 4) steps up for AARON's team
+  // after the pierce. (2.5s challenger takeover.)
+  { t: 54.0, do: 'challenger', idx: 4 },
+
+  // 1:04 — ULTIMATE: full-screen ulti video (starring MARKUS in the 3-4s
+  // beam shot). Lethal finisher credited to AARON's team (p1): when the
+  // video ENDS, p2's bar drains to 0 and the "AARON WINS!" banner pops.
+  { t: 64.0, do: 'ulti', side: 'p1', kill: true },
+
+  // (Track runs to ~88s; room after the ulti for the win/outro beats.)
+];
+
+// Back-compat alias for any code still referencing the old single-list name
+const CHOREOGRAPHY_CUES = SHOW_CUES;
+
+/* ==================================================================
+   ============  PLACEHOLDER IMAGE GENERATOR (swap-friendly)  =======
+   ================================================================== */
+const PALETTE = [
+  ['#ff5a3c','#7a1a00'], ['#3d9eff','#08305e'], ['#ffd23f','#7a5400'],
+  ['#9b5cff','#3a1769'], ['#3cd6a1','#0c4a36'], ['#ff7ec1','#7a1a4d'],
+  ['#5cd2ff','#0a3a5b'], ['#ff9a3c','#7a3a00'], ['#a3ff5c','#2e5a0d'],
+];
+function placeholderDataURI(name, idx) {
+  const [c1, c2] = PALETTE[idx % PALETTE.length];
+  const initials = name.split(/[\s-]/).map(w => w[0]).slice(0,2).join('');
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'>` +
+    `<defs><radialGradient id='g' cx='50%' cy='35%' r='75%'>` +
+    `<stop offset='0%' stop-color='${c1}'/>` +
+    `<stop offset='100%' stop-color='${c2}'/>` +
+    `</radialGradient></defs>` +
+    `<rect width='200' height='200' fill='url(#g)'/>` +
+    `<circle cx='100' cy='78' r='34' fill='rgba(255,255,255,0.18)'/>` +
+    `<rect x='52' y='128' width='96' height='62' rx='30' fill='rgba(255,255,255,0.18)'/>` +
+    `<text x='100' y='115' text-anchor='middle' font-family='Impact,Arial,sans-serif' ` +
+    `font-size='62' font-weight='900' fill='rgba(255,255,255,0.95)' ` +
+    `stroke='rgba(0,0,0,0.55)' stroke-width='2'>${initials}</text>` +
+    `</svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function imageFor(char, idx) {
+  return char.image || placeholderDataURI(char.name, idx);
+}
+
+/* ==================================================================
+   ============  WARPED SPHERE GRID (SVG)  ===========================
+   ================================================================== */
+function buildSphereGrid(svg) {
+  const meridians = 11;
+  const parallels = 9;
+  const R = 95;
+  const strokeMain = "rgba(150,230,255,0.85)";
+  const strokeOuter = "rgba(180,240,255,0.95)";
+  let html =
+    `<defs>
+       <radialGradient id='ringGlow' cx='50%' cy='50%' r='50%'>
+         <stop offset='0%' stop-color='rgba(120,200,255,0)'/>
+         <stop offset='55%' stop-color='rgba(120,200,255,0.10)'/>
+         <stop offset='100%' stop-color='rgba(120,200,255,0)'/>
+       </radialGradient>
+       <filter id='lineGlow' x='-30%' y='-30%' width='160%' height='160%'>
+         <feGaussianBlur stdDeviation='0.45' result='b'/>
+         <feMerge><feMergeNode in='b'/><feMergeNode in='SourceGraphic'/></feMerge>
+       </filter>
+       <linearGradient id='lineFadeV' x1='0' y1='-100' x2='0' y2='100' gradientUnits='userSpaceOnUse'>
+         <stop offset='0%' stop-color='rgba(150,230,255,0.25)'/>
+         <stop offset='50%' stop-color='rgba(150,230,255,1)'/>
+         <stop offset='100%' stop-color='rgba(150,230,255,0.25)'/>
+       </linearGradient>
+       <mask id='vFade'>
+         <rect x='-100' y='-100' width='200' height='200' fill='url(#lineFadeV)'/>
+       </mask>
+     </defs>
+     <g filter='url(#lineGlow)' mask='url(#vFade)'>
+     <circle cx='0' cy='0' r='${R}' fill='url(#ringGlow)'
+       stroke='${strokeOuter}' stroke-width='0.5'/>`;
+  for (let i = 1; i < meridians; i++) {
+    const t = i / meridians;
+    const angle = t * Math.PI;
+    const rx = Math.abs(R * Math.sin(angle));
+    html += `<ellipse cx='0' cy='0' rx='${rx.toFixed(2)}' ry='${R}'
+              fill='none' stroke='${strokeMain}' stroke-width='0.4'/>`;
+  }
+  for (let i = 1; i < parallels; i++) {
+    const t = i / parallels;
+    const angle = t * Math.PI;
+    const y = -R * Math.cos(angle);
+    const chord = R * Math.sin(angle);
+    html += `<ellipse cx='0' cy='${y.toFixed(2)}' rx='${chord.toFixed(2)}'
+              ry='${(chord*0.18).toFixed(2)}'
+              fill='none' stroke='${strokeMain}' stroke-width='0.4'/>`;
+  }
+  html += `</g>`;
+  svg.innerHTML = html;
+}
+buildSphereGrid(document.getElementById('sphereGrid'));
+buildSphereGrid(document.getElementById('vsGrid'));
+
+/* ==================================================================
+   ============  POPULATE TEXT FROM CONFIG  ==========================
+   ================================================================== */
+function renderText() {
+  document.getElementById('heroSelect').textContent = TEXT.heroSelect;
+  document.getElementById('timeLabel').textContent  = TEXT.timeLabel;
+  document.getElementById('hint').textContent       = TEXT.hint;
+  document.getElementById('flag-p1').textContent    = TEXT.player1;
+  document.getElementById('flag-p2').textContent    = TEXT.player2;
+  document.getElementById('vsLabel-p1').textContent = TEXT.player1;
+  document.getElementById('vsLabel-p2').textContent = TEXT.player2;
+  document.getElementById('spine-p1').textContent   = TEXT.spine;
+  document.getElementById('spine-p2').textContent   = TEXT.spine;
+  document.title = TEXT.brandMain + ' ' + TEXT.brandSeparator + ' ' + TEXT.brandTail;
+
+  // MvC3-style stacked logo block (top-left of each cover)
+  const logoHTML =
+    `<div class="logo-marvel">${TEXT.brandMain}</div>
+     <div class="logo-capcom-row">
+       <span class="logo-capcom">${TEXT.brandSeparator} ${TEXT.brandTail}</span>
+     </div>
+     <div class="logo-sub">${TEXT.brandSub}</div>`;
+  document.getElementById('logo-p1').innerHTML = logoHTML;
+  document.getElementById('logo-p2').innerHTML = logoHTML;
+}
+renderText();
+
+/* ==================================================================
+   ============  BUILD GRID  =========================================
+   ================================================================== */
+const gridEl = document.getElementById('grid');
+CHARACTERS.forEach((char, idx) => {
+  const slot = document.createElement('div');
+  slot.className = 'slot';
+  slot.dataset.idx = idx;
+  slot.innerHTML = `
+    <img src="${imageFor(char, idx)}" alt="${char.name}"/>
+    <div class="slot-name">${char.name}</div>
+  `;
+  gridEl.appendChild(slot);
+});
+
+/* ==================================================================
+   ============  STATE  ==============================================
+   ================================================================== */
+const state = {
+  p1: { row: 0, col: 0, selections: [], done: false },
+  p2: { row: GRID_ROWS - 1, col: GRID_COLS - 1, selections: [], done: false },
+};
+
+function buildStacks() {
+  ['p1','p2'].forEach(p => {
+    const stack = document.getElementById(`stack-${p}`);
+    stack.innerHTML = '';
+    for (let i = 0; i < SELECTIONS_PER_PLAYER; i++) {
+      const s = document.createElement('div');
+      s.className = 'slot-pick';
+      stack.appendChild(s);
+    }
+  });
+}
+buildStacks();
+
+/* ==================================================================
+   ============  CURSOR POSITIONING (transform-based, smooth)  =======
+   ================================================================== */
+// Cache slot offsets so we don't getBoundingClientRect() on every keypress.
+let slotOffsets = []; // array of {x, y}
+function recomputeSlotOffsets() {
+  slotOffsets = [];
+  const wrapper = gridEl.getBoundingClientRect();
+  for (const slot of gridEl.children) {
+    const r = slot.getBoundingClientRect();
+    slotOffsets.push({
+      x: r.left - wrapper.left + gridEl.offsetLeft,
+      y: r.top  - wrapper.top  + gridEl.offsetTop,
+      w: r.width, h: r.height,
+    });
+  }
+}
+function updateCursor(player) {
+  const s = state[player];
+  const idx = s.row * GRID_COLS + s.col;
+  const off = slotOffsets[idx];
+  if (!off) return;
+  const cursor = document.getElementById(`cursor-${player}`);
+  cursor.style.width  = off.w + 'px';
+  cursor.style.height = off.h + 'px';
+  cursor.style.transform = `translate3d(${off.x}px, ${off.y}px, 0)`;
+}
+function updateCursors() {
+  updateCursor('p1');
+  updateCursor('p2');
+}
+
+function updateLocks() {
+  [...gridEl.children].forEach(el => el.classList.remove('locked-p1','locked-p2'));
+  state.p1.selections.forEach(i => gridEl.children[i].classList.add('locked-p1'));
+  state.p2.selections.forEach(i => gridEl.children[i].classList.add('locked-p2'));
+}
+
+function updatePreview(player) {
+  const stack   = document.getElementById(`stack-${player}`);
+  const chars   = document.getElementById(`characters-${player}`);
+  const cover   = document.getElementById(`cover-${player}`);
+  const bigName = document.getElementById(`big-name-${player}`);
+  const s       = state[player];
+  const sel     = s.selections;
+
+  // Mini team thumbnails (unchanged)
+  [...stack.children].forEach((tile, i) => {
+    if (i < sel.length) {
+      const c = CHARACTERS[sel[i]];
+      tile.classList.add('filled');
+      tile.innerHTML = `
+        <img src="${imageFor(c, sel[i])}" alt="${c.name}"/>
+        <div class="pick-name">${c.name}</div>
+      `;
+    } else {
+      tile.classList.remove('filled');
+      tile.innerHTML = '';
+    }
+  });
+
+  // ---- Hover slot: should we render a translucent "next pick" preview? ----
+  // (Only while still selecting and the cursor is on an unconfirmed cell.)
+  let hoverCharIdx = null;
+  if (phase === 'selecting' && !s.done) {
+    const cursorIdx = s.row * GRID_COLS + s.col;
+    if (!sel.includes(cursorIdx) && CHARACTERS[cursorIdx]) {
+      hoverCharIdx = cursorIdx;
+    }
+  }
+
+  // ---- Reconcile confirmed picks (append-only, preserves entrance anim) ----
+  const confirmedEls = [...chars.querySelectorAll('.cover-char:not(.hover)')];
+  const existingKeys = confirmedEls.map(el => el.dataset.key);
+  const desiredKeys  = sel.map((idx, pos) => `c-${idx}@${pos}`);
+  const isPrefix = desiredKeys.slice(0, existingKeys.length)
+                              .every((k, i) => k === existingKeys[i]);
+  if (!isPrefix || desiredKeys.length < existingKeys.length) {
+    confirmedEls.forEach(el => el.remove());
+    existingKeys.length = 0;
+  }
+  for (let i = existingKeys.length; i < sel.length; i++) {
+    const charIdx = sel[i];
+    const c = CHARACTERS[charIdx];
+    const el = document.createElement('div');
+    el.className = 'cover-char';
+    el.dataset.key = `c-${charIdx}@${i}`;
+    el.style.backgroundImage = `url("${imageFor(c, charIdx)}")`;
+    chars.appendChild(el);
+  }
+
+  // ---- Reconcile hover slot (always the last child when present) ----
+  let hoverEl = chars.querySelector('.cover-char.hover');
+  if (hoverCharIdx === null) {
+    if (hoverEl) hoverEl.remove();
+    hoverEl = null;
+  } else {
+    const c = CHARACTERS[hoverCharIdx];
+    const url = `url("${imageFor(c, hoverCharIdx)}")`;
+    if (!hoverEl) {
+      hoverEl = document.createElement('div');
+      hoverEl.className = 'cover-char hover';
+      hoverEl.style.backgroundImage = url;
+      chars.appendChild(hoverEl);
+    } else {
+      // Make sure it stays the last child (newest in stacking order)
+      if (chars.lastElementChild !== hoverEl) chars.appendChild(hoverEl);
+      if (hoverEl.style.backgroundImage !== url) hoverEl.style.backgroundImage = url;
+    }
+    hoverEl.dataset.charIdx = String(hoverCharIdx);
+  }
+
+  // ---- Recompute count & recency across ALL children (confirmed + hover) ----
+  const kids = [...chars.children];
+  const total = kids.length;
+  kids.forEach((el, i) => { el.dataset.recency = String(total - 1 - i); });
+  chars.dataset.count = String(total);
+
+  // ---- Big name + cover state classes ----
+  if (total > 0) {
+    chars.classList.remove('empty');
+    cover.classList.add('has-feature');
+    // Latest visible character = hover if present, else most recent confirmed
+    const featuredIdx = hoverCharIdx !== null ? hoverCharIdx : sel[sel.length - 1];
+    setBigName(bigName, CHARACTERS[featuredIdx].name);
+    bigName.classList.remove('empty');
+  } else {
+    chars.classList.add('empty');
+    cover.classList.remove('has-feature');
+    setBigName(bigName, 'SELECT');
+    bigName.classList.add('empty');
+  }
+
+  // Toggle the cover-level "preview-hover" state class — drives the
+  // PREVIEW badge visibility and the italic dim styling on .big-name
+  cover.classList.toggle('preview-hover', hoverCharIdx !== null);
+}
+
+// Hover updates re-run the same renderer (they only differ from a real
+// confirm in that they don't push to selections). Kept as a separate
+// name so the call sites still read clearly.
+function updateHoverPreview(player) { updatePreview(player); }
+
+// Set the big character name and auto-shrink its font so a long name
+// (e.g. WOLVERINE) doesn't overflow the available width.
+function setBigName(el, text) {
+  el.textContent = text;
+  el.style.fontSize = '';  // reset to the CSS clamp() max
+  requestAnimationFrame(() => {
+    let size = parseFloat(getComputedStyle(el).fontSize) || 60;
+    let guard = 30;
+    while (el.scrollWidth > el.clientWidth + 1 && size > 14 && guard-- > 0) {
+      size -= 2;
+      el.style.fontSize = size + 'px';
+    }
+  });
+}
+
+/* ==================================================================
+   ============  AUDIO  ==============================================
+   ================================================================== */
+let audioCtx = null;
+let masterGain = null;
+let bgmGain = null;
+let sfxGain = null;
+let bgmStarted = false;
+let bgmTimer = null;
+let muted = false;
+
+function audio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 1.0;
+    masterGain.connect(audioCtx.destination);
+
+    bgmGain = audioCtx.createGain();
+    bgmGain.gain.value = BGM_VOLUME;
+    bgmGain.connect(masterGain);
+
+    sfxGain = audioCtx.createGain();
+    sfxGain.gain.value = 0.8;
+    sfxGain.connect(masterGain);
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ---- Sound effects --------------------------------------------------
+// Synth SFX disabled — they sounded tacky for a live show. Background
+// music (bgmAudio mp3) is unaffected and still routes through bgmGain.
+function sfx() {}
+function playCursorMove() {}
+function playConfirm() {}
+function playReject() {}
+function playVSImpact() {}
+
+/* ----  BACKGROUND MUSIC (two tracks: select + show) --------------- */
+// Two <audio> elements so the select theme can stay looping during
+// character pick, then we swap to the show track when VS triggers.
+const bgmSelect = document.getElementById('bgmSelect');
+const bgmShow   = document.getElementById('bgmShow');
+const bgmAudio  = document.getElementById('bgmAudio'); // back-compat alias
+bgmSelect.src = encodeURI(SELECT_BGM_PATH);
+bgmShow.src   = encodeURI(SHOW_BGM_PATH);
+bgmSelect.volume = BGM_VOLUME;
+bgmShow.volume   = BGM_VOLUME;
+bgmSelect.loop = true;
+bgmShow.loop   = false;       // show track plays once through; we drive it
+// Keep the legacy element silent — we don't use it for playback anymore
+bgmAudio.src = encodeURI(SHOW_BGM_PATH);
+bgmAudio.muted = true;
+
+// Whichever track is currently the "active" one for the runner to watch
+function activeBgm() { return phase === 'selecting' ? bgmSelect : bgmShow; }
+
+function startBGM() {
+  if (bgmStarted) return;
+  bgmStarted = true;
+  // Start whichever track matches the current phase
+  const a = activeBgm();
+  const p = a.play();
+  if (p && typeof p.catch === 'function') {
+    p.catch(err => {
+      console.warn('BGM autoplay blocked or file missing:', err);
+      bgmStarted = false;
+    });
+  }
+}
+function stopBGM() {
+  bgmStarted = false;
+  bgmSelect.pause();
+  bgmShow.pause();
+}
+
+function setMuted(m) {
+  muted = m;
+  if (masterGain && audioCtx) {
+    masterGain.gain.setTargetAtTime(m ? 0 : 1, audioCtx.currentTime, 0.02);
+  }
+  bgmSelect.muted = m;
+  bgmShow.muted   = m;
+}
+
+// Phase-driven music swap. Called when phase changes between
+// 'selecting' / 'vs' / 'fighting'. The VS screen onward plays the
+// show track starting at SHOW_BGM_START_TIME.
+function swapMusicForPhase(newPhase) {
+  if (newPhase === 'selecting') {
+    bgmShow.pause();
+    bgmSelect.currentTime = bgmSelect.currentTime || 0;
+    bgmSelect.play().catch(() => {});
+  } else if (newPhase === 'vs' || newPhase === 'fighting') {
+    // Only swap on the FIRST transition out of selecting (avoid restart
+    // when going vs -> fighting if show track is already running)
+    if (bgmShow.paused) {
+      bgmSelect.pause();
+      bgmShow.currentTime = SHOW_BGM_START_TIME;
+      bgmShow.play().catch(err => console.warn('show bgm:', err));
+    }
+  }
+}
+
+/* ==================================================================
+   ============  MOVE / CONFIRM / RESET  =============================
+   ================================================================== */
+function move(player, dr, dc) {
+  const s = state[player];
+  if (s.done) return;
+  const nr = Math.max(0, Math.min(GRID_ROWS - 1, s.row + dr));
+  const nc = Math.max(0, Math.min(GRID_COLS - 1, s.col + dc));
+  if (nr === s.row && nc === s.col) return;
+  s.row = nr; s.col = nc;
+  playCursorMove();
+  updateCursor(player);
+  updateHoverPreview(player);
+}
+
+function confirm(player) {
+  const s = state[player];
+  if (s.done) return;
+  const idx = s.row * GRID_COLS + s.col;
+  if (s.selections.includes(idx)) { playReject(); return; }
+  s.selections.push(idx);
+  playConfirm();
+  updatePreview(player);
+  updateLocks();
+  if (s.selections.length >= SELECTIONS_PER_PLAYER) s.done = true;
+  updateHoverPreview(player);
+  // (No challenger screen on selection — that fires on fight swap-ins instead.)
+  // Both players done -> wait for global Enter to advance into VS screen
+}
+
+/* Apply a deferred teammate swap (queued by handleKO) for whichever side's
+   incoming fighter matches charIdx, refilling their health bar. Called from
+   showChallenger so the bar only updates once the foe has actually arrived. */
+function applyPendingSwap(charIdx) {
+  ['p1', 'p2'].forEach(side => {
+    const f = fight[side];
+    if (!f || !f.pendingSwap) return;
+    const nextIdx = state[side].selections[f.activeIdx + 1];
+    if (nextIdx === charIdx) {
+      f.activeIdx += 1;
+      f.hp = MAX_HP;
+      f.pendingSwap = false;
+      renderFightHUD(side);
+    }
+  });
+}
+
+/* Full-screen "Challenger Approaching" takeover (2.5s) with the entering
+   character's face composited over the white burst. Works for any
+   character — shows their photo if set, else the placeholder. */
+function showChallenger(charIdx) {
+  const c = CHARACTERS[charIdx];
+  if (!c) return;
+  const screen = document.getElementById('challenger');
+  const vid    = document.getElementById('challengerVid');
+  const face   = document.getElementById('challengerFace');
+  face.style.backgroundImage = `url("${imageFor(c, charIdx)}")`;
+  screen.classList.remove('show'); void screen.offsetWidth;
+  screen.classList.add('show');
+  // The foe has arrived: now apply any deferred teammate swap so the new
+  // fighter's full health bar appears with the reveal (and not before it).
+  applyPendingSwap(charIdx);
+  try {
+    // Unmuted — the template's "challenger" jingle plays over the show song.
+    vid.muted = false;
+    vid.currentTime = 0;
+    const p = vid.play();
+    if (p && p.catch) p.catch(() => {});
+  } catch (e) {}
+  clearTimeout(showChallenger._t);
+  showChallenger._t = setTimeout(() => {
+    screen.classList.remove('show');
+    vid.pause();
+  }, 2500);
+}
+
+
+// Phase machine: 'selecting' -> 'vs' -> 'fighting'
+let phase = 'selecting';
+function bothPlayersReady() { return state.p1.done && state.p2.done; }
+
+function reset() {
+  phase = 'selecting';
+  state.p1 = { row: 0, col: 0, selections: [], done: false };
+  state.p2 = { row: GRID_ROWS - 1, col: GRID_COLS - 1, selections: [], done: false };
+  buildStacks();
+  updatePreview('p1');
+  updatePreview('p2');
+  updateLocks();
+  document.getElementById('vsScreen').classList.remove('visible');
+  document.getElementById('fightScreen').classList.remove('visible');
+  document.getElementById('fightKO').classList.remove('show');
+  document.getElementById('vs-portraits-p1').innerHTML = '';
+  document.getElementById('vs-portraits-p2').innerHTML = '';
+  // Clear the ulti video overlay in case it was showing
+  const uv = document.getElementById('ultiVideo');
+  if (uv) { uv.pause(); uv.classList.remove('show'); uv.currentTime = 0; }
+  // Clear the challenger screen
+  clearTimeout(showChallenger._t);
+  const ch = document.getElementById('challenger');
+  if (ch) { ch.classList.remove('show'); const cv = document.getElementById('challengerVid'); if (cv) cv.pause(); }
+  // Recompute layout (VS screen may have interfered) and snap cursors instantly
+  // so the visual position matches the freshly reset state.
+  recomputeSlotOffsets();
+  ['p1','p2'].forEach(player => {
+    const cursor = document.getElementById(`cursor-${player}`);
+    const prev = cursor.style.transition;
+    cursor.style.transition = 'none';
+    updateCursor(player);
+    // force reflow, then restore transition
+    void cursor.offsetWidth;
+    cursor.style.transition = prev;
+    updateHoverPreview(player);
+  });
+}
+
+/* ==================================================================
+   ============  VS SCREEN  ==========================================
+   ================================================================== */
+function triggerVS() {
+  const flash = document.getElementById('vsFlash');
+  flash.classList.remove('go'); void flash.offsetWidth; flash.classList.add('go');
+  playVSImpact();
+
+  ['p1','p2'].forEach(p => {
+    const target = document.getElementById(`vs-portraits-${p}`);
+    target.innerHTML = '';
+    state[p].selections.forEach(i => {
+      const c = CHARACTERS[i];
+      const el = document.createElement('div');
+      el.className = 'vs-portrait';
+      el.innerHTML = `<img src="${imageFor(c, i)}" alt="${c.name}"/>
+                      <div class="pname">${c.name}</div>`;
+      target.appendChild(el);
+    });
+  });
+
+  const vs = document.getElementById('vsScreen');
+  vs.classList.remove('visible'); void vs.offsetWidth;
+  vs.classList.add('visible');
+}
+
+/* ==================================================================
+   ============  FIGHT SCREEN  =======================================
+   ==================================================================
+   Operator controls (during phase === 'fighting'):
+     A          - damage P1   (random ~8-16%)
+     D          - heal P1     (~5%, in case you over-tap)
+     Q          - P1 medium attack FX
+     E          - P1 super move FX
+     LeftArrow  - damage P2
+     RightArrow - heal P2
+     [          - P2 medium attack FX
+     ]          - P2 super move FX
+================================================================== */
+
+const MAX_HP = 100;
+const DAMAGE_MIN = 8;
+const DAMAGE_MAX = 16;
+const HEAL_AMT = 5;
+
+const fight = {
+  p1: { team: [], activeIdx: 0, hp: MAX_HP, defeated: false },
+  p2: { team: [], activeIdx: 0, hp: MAX_HP, defeated: false },
+};
+
+function startFight() {
+  // Build team rosters from the picks each player made during selection
+  ['p1','p2'].forEach(p => {
+    fight[p] = {
+      team: state[p].selections.map(i => CHARACTERS[i]),
+      activeIdx: 0,
+      hp: MAX_HP,
+      defeated: false,
+    };
+  });
+
+  // Hide VS, show fight screen
+  document.getElementById('vsScreen').classList.remove('visible');
+  const fs = document.getElementById('fightScreen');
+  fs.classList.remove('visible'); void fs.offsetWidth;
+  fs.classList.add('visible');
+
+  // Hide any leftover KO banner
+  const ko = document.getElementById('fightKO');
+  ko.classList.remove('show');
+  ko.textContent = '';
+
+  renderFightHUD('p1');
+  renderFightHUD('p2');
+}
+
+function renderFightHUD(player) {
+  const f = fight[player];
+  const portrait = document.getElementById(`fightPortrait-${player}`);
+  const fill     = document.getElementById(`hpFill-${player}`);
+  const name     = document.getElementById(`fightName-${player}`);
+  const reserve  = document.getElementById(`reserve-${player}`);
+
+  // Active character (or last KO'd if team wiped)
+  const activeChar = f.team[Math.min(f.activeIdx, f.team.length - 1)];
+  if (activeChar) {
+    portrait.innerHTML = `<img src="${activeChar.image || placeholderDataURI(activeChar.name, 0)}" alt="${activeChar.name}"/>`;
+    name.textContent = activeChar.name;
+  }
+
+  const pct = Math.max(0, Math.min(100, f.hp));
+  fill.style.width = pct + '%';
+  fill.classList.toggle('low', pct > 0 && pct <= 30);
+  fill.classList.toggle('empty', pct <= 0);
+
+  // Reserve pills = team members NOT currently active
+  reserve.innerHTML = '';
+  f.team.forEach((c, i) => {
+    if (i === f.activeIdx && !f.defeated) return;  // skip current
+    const pill = document.createElement('div');
+    pill.className = 'reserve-pill' + (i < f.activeIdx || (f.defeated && i === f.activeIdx) ? ' ko' : '');
+    pill.innerHTML = `<span>${c.name}</span>`;
+    reserve.appendChild(pill);
+  });
+}
+
+function damagePlayer(player) {
+  const f = fight[player];
+  if (f.defeated) return;
+  const dmg = DAMAGE_MIN + Math.floor(Math.random() * (DAMAGE_MAX - DAMAGE_MIN + 1));
+  f.hp = Math.max(0, f.hp - dmg);
+  // small hit feedback
+  hitShake();
+  sfx(180, 0.06, { type: 'square', gain: 0.12, slideTo: 110 });
+
+  if (f.hp <= 0) {
+    handleKO(player);
+  }
+  renderFightHUD(player);
+}
+
+function healPlayer(player) {
+  const f = fight[player];
+  if (f.defeated) return;
+  if (f.hp >= MAX_HP) { playReject(); return; }
+  f.hp = Math.min(MAX_HP, f.hp + HEAL_AMT);
+  sfx(660, 0.07, { type: 'sine', gain: 0.10, slideTo: 880 });
+  renderFightHUD(player);
+}
+
+function handleKO(player) {
+  const f = fight[player];
+  // Try to swap to next teammate
+  if (f.activeIdx < f.team.length - 1) {
+    // Drop a red "K.O.!" so the audience reads the kill, then mark a
+    // PENDING swap. The incoming fighter and their full health bar are
+    // NOT shown yet — that happens only when the matching `challenger`
+    // ("A NEW FOE APPEARED") cue fires at its hardcoded time. Until then
+    // the downed fighter's emptied bar stays on screen.
+    showFXText('K.O.!', false, false, 'ko');
+    hitShake();
+    f.pendingSwap = true;
+  } else {
+    f.defeated = true;
+    f.hp = 0;
+    // Whole team down: show big KO banner
+    showKO(player === 'p1' ? 'p2' : 'p1');
+  }
+}
+
+function hitShake() {
+  const fs = document.getElementById('fightScreen');
+  fs.classList.remove('shake'); void fs.offsetWidth; fs.classList.add('shake');
+}
+
+/* --------------------------------------------------------------------
+   MOVE TABLES — each character has their own medium move name and a
+   unique super-move name + visual TYPE. The type selects which
+   animation set fires:
+     beam   — horizontal energy beam crosses the screen
+     quake  — shockwave rises from the ground + light pillars
+     slash  — diagonal blade-marks rip across the screen
+     plasma — large orb grows out, then exploding rings
+     rush   — rapid sequence of impact bursts (combo flurry)
+   Move names here are deliberately generic so they're not specific
+   to any one fighting game — they describe the visual, not a
+   trademarked technique.
+-------------------------------------------------------------------- */
+const SUPER_MOVES = {
+  AARON:    { name: 'AARON BREAK!',   type: 'beam'   },
+  JWONG:    { name: 'JWONG STORM!',   type: 'plasma' },
+  ANDREW:   { name: 'ANDREW BLAZE!',  type: 'slash'  },
+  MATT:     { name: 'MATT CRUSH!',    type: 'quake'  },
+  'KENG I': { name: 'KENG SPECIAL!',  type: 'plasma' },
+  MARKUS:   { name: 'MARKUS BLAST!',  type: 'beam'   },
+  'KIAN HWEE': { name: 'KIAN FURY!',  type: 'rush'   },
+  BRAYDON:  { name: 'BRAYDON SLAM!',  type: 'quake'  },
+  JOEL:     { name: 'POWER SURGE!',   type: 'rush'   },
+};
+const MEDIUM_MOVES = {
+  AARON:    'POWER PUNCH!',
+  JWONG:    'JWONG SHOT!',
+  ANDREW:   'STRIKE!',
+  MATT:     'MATT SLAM!',
+  'KENG I': 'KENG SHOT!',
+  MARKUS:   'WEAPON SHOT!',
+  'KIAN HWEE': 'KIAN HIT!',
+  BRAYDON:  'BRAYDON BASH!',
+  JOEL:     'POWER STRIKE!',
+};
+
+const MEDIUM_DAMAGE_MIN = 12;
+const MEDIUM_DAMAGE_MAX = 20;
+const SUPER_DAMAGE_MIN  = 30;
+const SUPER_DAMAGE_MAX  = 45;
+
+function activeChar(player) {
+  const f = fight[player];
+  return f.team[Math.min(f.activeIdx, f.team.length - 1)];
+}
+function opponent(player) { return player === 'p1' ? 'p2' : 'p1'; }
+
+/* --------------------------------------------------------------------
+   playMediumFX(player)  - Projectile attack (slow energy projectile)
+   - Spawns offscreen behind the player and travels across screen
+   - Emits trailing sparks as it flies
+   - On impact, deals 12-20 damage to opponent and shows medium FX text
+-------------------------------------------------------------------- */
+/* Visual half only: kicks off the projectile animation + sparkle trail.
+   Used by the choreography runner when we want the impact pinned to a
+   precise song time (separate `fire-impact` cue handles the impact). */
+function playMediumFXVisual(player) {
+  const proj = document.getElementById('projectile');
+  const cool = (player === 'p2');
+  const ac = activeChar(player);
+  const moveName = (ac && MEDIUM_MOVES[ac.name]) || 'POWER SHOT!';
+
+  proj.className = 'projectile' + (cool ? ' cool' : '');
+  void proj.offsetWidth;
+  proj.classList.add(player === 'p1' ? 'fire-p1' : 'fire-p2');
+
+  // (move-name callout text removed per request)
+
+  // Trailing sparks during the 1.5s flight
+  let tStart = performance.now();
+  const trail = setInterval(() => {
+    const elapsed = performance.now() - tStart;
+    const pct = elapsed / 1450;
+    if (pct >= 1) { clearInterval(trail); return; }
+    const x = player === 'p1' ? (-40 + pct * 150) : (110 - pct * 150);
+    spawnTrailBurst(x, 48, cool, 3);
+  }, 90);
+}
+
+/* Impact half only: bright burst + damage application. */
+function playMediumFXImpact(player, opts = {}) {
+  const impact = document.getElementById('impactBurst');
+  const cool = (player === 'p2');
+  const opp = opponent(player);
+
+  impact.className = 'impact-burst' + (cool ? ' cool' : '');
+  impact.style.left = (player === 'p1' ? '76vw' : '8vw');
+  void impact.offsetWidth;
+  impact.classList.add('go');
+
+  // Big anime fire explosion at the impact point (opponent's side)
+  playFxVideo('fireImpact', { left: (player === 'p1' ? '78vw' : '22vw'), top: '50%' });
+  // Large shockwave at the impact for grandeur
+  playFxVideo('shockCool', { left: (player === 'p1' ? '78vw' : '22vw'), top: '50%', width: '90vw' });
+  hitShake();
+
+  if (!fight[opp].defeated) {
+    const dmg = (opts.amount != null)
+      ? opts.amount
+      : MEDIUM_DAMAGE_MIN + Math.floor(Math.random() * (MEDIUM_DAMAGE_MAX - MEDIUM_DAMAGE_MIN + 1));
+    fight[opp].hp = Math.max(0, fight[opp].hp - dmg);
+    spawnSparks(opp, cool, 22, 8);
+    if (fight[opp].hp <= 0) handleKO(opp);
+    renderFightHUD(opp);
+  }
+}
+
+/* Unified call (used by the manual Q / [ keys and the old 'fireball' cue).
+   Visual now, impact 1.28s later via setTimeout. Adequate for one-off
+   manual presses; the choreography runner uses the split version for
+   tight song-locked timing. */
+function playMediumFX(player, opts = {}) {
+  playMediumFXVisual(player);
+  setTimeout(() => playMediumFXImpact(player, opts), 1280);
+}
+
+/* --------------------------------------------------------------------
+   playSuperFX(player)  - Character-specific Hyper move
+   Routes to one of five animation types based on the active
+   character's moveset. Damages opponent for 30-45 hp.
+-------------------------------------------------------------------- */
+function playSuperFX(player) {
+  const cool  = (player === 'p2');
+  const opp   = opponent(player);
+  const ac    = activeChar(player);
+  const move  = (ac && SUPER_MOVES[ac.name]) || { name: 'POWER SURGE!', type: 'beam' };
+
+  const dim   = document.getElementById('fightDim');
+  const flash = document.getElementById('fightFlash');
+  const streak = document.getElementById('fxStreak');
+  const counter = document.getElementById('hitCounter');
+  const hitNum  = document.getElementById('hitNum');
+
+  // Big white flash + darken background (cinematic zoom-in feel)
+  flash.classList.remove('medium','super'); void flash.offsetWidth;
+  flash.classList.add('super');
+  dim.classList.add('on');
+  setTimeout(() => dim.classList.remove('on'), 1900);
+
+  // Diagonal light streak sweep
+  streak.classList.remove('go'); void streak.offsetWidth;
+  streak.classList.add('go');
+
+  // Route to the move's visual type
+  switch (move.type) {
+    case 'beam':   playSuperBeam(player, cool);   break;
+    case 'quake':  playSuperQuake(player, cool);  break;
+    case 'slash':  playSuperSlash(player, cool);  break;
+    case 'plasma': playSuperPlasma(player, cool); break;
+    case 'rush':   playSuperRush(player, cool);   break;
+    default:       playSuperBeam(player, cool);
+  }
+
+  // Heavy spark burst from the player's side
+  spawnSparks(player, cool, 50, 14);
+  // Big central shockwave on the player's side
+  playFxVideo('shockCool', { left: (player === 'p1' ? '34vw' : '66vw'), top: '48%', width: '100vw' });
+
+  // (move-name text + hit counter removed per request)
+
+  // Damage opponent
+  if (!fight[opp].defeated) {
+    const dmg = SUPER_DAMAGE_MIN + Math.floor(Math.random() * (SUPER_DAMAGE_MAX - SUPER_DAMAGE_MIN + 1));
+    // Apply damage halfway through the animation so the bar visibly drains during the fx
+    setTimeout(() => {
+      if (fight[opp].defeated) return;
+      fight[opp].hp = Math.max(0, fight[opp].hp - dmg);
+      if (fight[opp].hp <= 0) handleKO(opp);
+      renderFightHUD(opp);
+    }, 700);
+  }
+
+  playVSImpact();
+  hitShake();
+}
+
+/* Helper: shared FX text invocation.
+   variant: undefined (warm yellow), 'cool' (cyan), 'ko' (red KO style)  */
+function showFXText(text, cool, isBig, variant) {
+  const txt = document.getElementById('fxText');
+  txt.classList.remove('show', 'p2-color', 'ko-color'); void txt.offsetWidth;
+  if (variant === 'ko')      txt.classList.add('ko-color');
+  else if (cool)             txt.classList.add('p2-color');
+  txt.textContent = text;
+  txt.classList.add('show');
+}
+
+/* Spawn a fan of sparks of various sizes/durations flying outward */
+function spawnSparks(player, cool, count = 28, streakCount = 8) {
+  const field = document.getElementById('sparkField');
+  const originX = player === 'p1' ? 14 : 86;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('div');
+    s.className = 'spark' + (cool ? ' cool' : '');
+    const sz = 3 + Math.random() * 9;
+    s.style.width = sz + 'px';
+    s.style.height = sz + 'px';
+    s.style.left = (originX + (Math.random() - 0.5) * 8) + '%';
+    s.style.top  = (45 + (Math.random() - 0.5) * 40) + '%';
+    const ang  = (Math.random() * Math.PI) - Math.PI / 2;
+    const sign = player === 'p1' ? 1 : -1;
+    const dist = 100 + Math.random() * 260;
+    s.style.setProperty('--dx', (sign * Math.cos(ang) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dur', (700 + Math.random() * 700) + 'ms');
+    s.style.animationDelay = (Math.random() * 300) + 'ms';
+    field.appendChild(s);
+    requestAnimationFrame(() => s.classList.add('go'));
+  }
+  // Long motion-blur streak sparks
+  for (let i = 0; i < streakCount; i++) {
+    const s = document.createElement('div');
+    s.className = 'spark-streak' + (cool ? ' cool' : '');
+    s.style.width = (60 + Math.random() * 90) + 'px';
+    s.style.left = (originX + (Math.random() - 0.5) * 6) + '%';
+    s.style.top  = (45 + (Math.random() - 0.5) * 35) + '%';
+    const angDeg = (Math.random() * 70) - 35 + (player === 'p1' ? 0 : 180);
+    s.style.setProperty('--ang', angDeg + 'deg');
+    const sign = player === 'p1' ? 1 : -1;
+    const dist = 180 + Math.random() * 200;
+    s.style.setProperty('--dx', (sign * Math.cos(angDeg * Math.PI / 180) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dy', (Math.sin(angDeg * Math.PI / 180) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dur', (600 + Math.random() * 500) + 'ms');
+    s.style.animationDelay = (Math.random() * 250) + 'ms';
+    field.appendChild(s);
+    requestAnimationFrame(() => s.classList.add('go'));
+  }
+  // Twinkles that linger
+  for (let i = 0; i < Math.min(count / 2 | 0, 18); i++) {
+    const t = document.createElement('div');
+    t.className = 'twinkle' + (cool ? ' cool' : '');
+    t.style.left = (10 + Math.random() * 80) + '%';
+    t.style.top  = (20 + Math.random() * 60) + '%';
+    t.style.animationDelay = (Math.random() * 600) + 'ms';
+    field.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('go'));
+  }
+  setTimeout(() => {
+    [...field.children].forEach(c => {
+      if (!c.classList.contains('go')) return;
+      // Remove old elements gradually so we don't bloat the DOM
+      c.remove();
+    });
+  }, 2400);
+}
+
+/* Small trailing sparks emitted behind the projectile mid-flight */
+function spawnTrailBurst(xPct, yPct, cool, n = 3) {
+  const field = document.getElementById('sparkField');
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    s.className = 'spark' + (cool ? ' cool' : '');
+    const sz = 3 + Math.random() * 5;
+    s.style.width = sz + 'px';
+    s.style.height = sz + 'px';
+    s.style.left = (xPct + (Math.random() - 0.5) * 4) + '%';
+    s.style.top  = (yPct + (Math.random() - 0.5) * 10) + '%';
+    const ang = (Math.random() * Math.PI) - Math.PI / 2;
+    const dist = 30 + Math.random() * 70;
+    s.style.setProperty('--dx', (Math.cos(ang) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dy', (Math.sin(ang) * dist).toFixed(1) + 'px');
+    s.style.setProperty('--dur', (500 + Math.random() * 400) + 'ms');
+    field.appendChild(s);
+    requestAnimationFrame(() => s.classList.add('go'));
+    setTimeout(() => s.remove(), 1200);
+  }
+}
+
+/* ---------- Super move variants ---------- */
+function playSuperBeam(player, cool) {
+  const beam = document.getElementById('hyperBeam');
+  beam.className = 'hyper-beam' + (cool ? ' cool' : '');
+  void beam.offsetWidth;
+  beam.classList.add(player === 'p1' ? 'fire-p1' : 'fire-p2');
+}
+
+function playSuperQuake(player, cool) {
+  const wave = document.getElementById('quakeWave');
+  wave.className = 'quake-wave' + (cool ? ' cool' : '');
+  void wave.offsetWidth;
+  wave.classList.add('go');
+
+  // Light pillars rising from the ground
+  const cracks = document.getElementById('quakeCracks');
+  cracks.innerHTML = '';
+  const total = 9;
+  for (let i = 0; i < total; i++) {
+    const c = document.createElement('div');
+    c.className = 'quake-crack' + (cool ? ' cool' : '');
+    c.style.left = (8 + i * (84 / (total - 1)) + (Math.random() - 0.5) * 4) + '%';
+    c.style.animationDelay = (i * 55 + Math.random() * 80) + 'ms';
+    cracks.appendChild(c);
+    requestAnimationFrame(() => c.classList.add('go'));
+  }
+  setTimeout(() => cracks.innerHTML = '', 1600);
+  // Extra screen shake (quake!)
+  hitShake();
+  setTimeout(hitShake, 220);
+}
+
+function playSuperSlash(player, cool) {
+  const field = document.getElementById('slashField');
+  field.innerHTML = '';
+  // 6 rapid slashes in an X pattern across the center
+  const angles = [22, -22, 35, -35, 12, -12];
+  angles.forEach((ang, i) => {
+    const s = document.createElement('div');
+    s.className = 'slash-mark' + (cool ? ' cool' : '');
+    s.style.setProperty('--ang', ang + 'deg');
+    s.style.top = (35 + (i % 3) * 12) + '%';
+    s.style.animationDelay = (i * 90) + 'ms';
+    field.appendChild(s);
+    requestAnimationFrame(() => s.classList.add('go'));
+  });
+  setTimeout(() => field.innerHTML = '', 1300);
+}
+
+function playSuperPlasma(player, cool) {
+  const orb = document.getElementById('plasmaOrb');
+  orb.className = 'plasma-orb' + (cool ? ' cool' : '');
+  void orb.offsetWidth;
+  orb.classList.add('go');
+
+  const rings = document.getElementById('plasmaRings');
+  rings.innerHTML = '';
+  // 3 expanding rings staggered
+  for (let i = 0; i < 3; i++) {
+    const r = document.createElement('div');
+    r.className = 'plasma-ring' + (cool ? ' cool' : '');
+    r.style.animationDelay = (i * 180) + 'ms';
+    rings.appendChild(r);
+    requestAnimationFrame(() => r.classList.add('go'));
+  }
+  setTimeout(() => rings.innerHTML = '', 1400);
+}
+
+function playSuperRush(player, cool) {
+  const field = document.getElementById('rushField');
+  field.innerHTML = '';
+  // 10 rapid impact bursts scattered around the opponent's half of the screen
+  const opp = opponent(player);
+  const centerX = opp === 'p2' ? 72 : 28;
+  for (let i = 0; i < 10; i++) {
+    const hit = document.createElement('div');
+    hit.className = 'rush-hit' + (cool ? ' cool' : '');
+    hit.style.left = (centerX + (Math.random() - 0.5) * 30) + '%';
+    hit.style.top  = (50 + (Math.random() - 0.5) * 50) + '%';
+    hit.style.animationDelay = (i * 80) + 'ms';
+    field.appendChild(hit);
+    requestAnimationFrame(() => hit.classList.add('go'));
+  }
+  setTimeout(() => field.innerHTML = '', 1500);
+}
+
+function showKO(winnerPlayer) {
+  const ko = document.getElementById('fightKO');
+  // Full-screen anime splat behind the K.O. text
+  playFxVideo('koVideo');
+  // Huge orange shockwave sweeps the screen for the climax
+  playFxVideo('shockWarm', { left: '50%', top: '50%', width: '150vw' });
+  ko.textContent = 'K.O.';
+  ko.classList.remove('wins');   // big single-line style for the K.O. hit
+  ko.classList.remove('show'); void ko.offsetWidth; ko.classList.add('show');
+  playVSImpact();
+  // After a beat, swap to "WINS" message — credit the LEAD character of
+  // the winning team (team[0]) rather than whoever happens to be active
+  // when the killing blow lands. So when JOEL's ulti finishes R2, the
+  // banner reads "MELVIN WINS!".
+  setTimeout(() => {
+    const w = fight[winnerPlayer];
+    // Credit the WHOLE winning team, e.g. "AARON AND KENG I WINS!"
+    const names = w.team.map(c => c?.name).filter(Boolean).join(' AND ');
+    ko.textContent = (names || (winnerPlayer === 'p1' ? 'PLAYER 1' : 'PLAYER 2')) + ' WINS!';
+    ko.classList.add('wins');    // smaller, wrapping style so long names fit
+    ko.classList.remove('show'); void ko.offsetWidth; ko.classList.add('show');
+  }, 1700);
+}
+
+/* ==================================================================
+   ============  CHOREOGRAPHY RUNNER  ================================
+   ==================================================================
+   Two cue lists:
+     SELECT_CUES — timed from when P was pressed (wall-clock seconds),
+                   fires only while phase === 'selecting'.
+     SHOW_CUES   — timed against bgmShow.currentTime (show-track seconds),
+                   fires from VS screen onward.
+================================================================== */
+let showRunning      = false;
+let tickActive       = false; // guards against spawning duplicate tick loops
+let showStartedAt    = 0;     // performance.now() when P was pressed
+let lastSelectCueIdx = -1;
+let lastShowCueIdx   = -1;
+
+const ultiVideo = document.getElementById('ultiVideo');
+ultiVideo.src = encodeURI(ULT_VIDEO_PATH);
+
+/* --- per-cue helpers --- */
+function gotoCursor(player, row, col) {
+  const s = state[player];
+  if (s.done || phase !== 'selecting') return;
+  s.row = Math.max(0, Math.min(GRID_ROWS - 1, row));
+  s.col = Math.max(0, Math.min(GRID_COLS - 1, col));
+  updateCursor(player);
+  updateHoverPreview(player);
+}
+
+function applyExactDamage(player, amount) {
+  const f = fight[player];
+  if (!f || f.defeated) return;
+  f.hp = Math.max(0, f.hp - amount);
+  hitEffect(player);                 // burst + comic word + sparks on the struck side
+  if (f.hp <= 0) handleKO(player);
+  renderFightHUD(player);
+}
+
+/* Play one of the alpha-webm FX clips. Resets to frame 0 each call so it
+   retriggers cleanly for rapid hits. Position/size via opts (left/top/width
+   in CSS units). If the file is missing, play() rejects and we hide it —
+   the CSS bursts underneath still carry the moment. */
+function playFxVideo(id, opts = {}) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (opts.left  != null) el.style.left  = opts.left;
+  if (opts.top   != null) el.style.top   = opts.top;
+  if (opts.width != null) el.style.width = opts.width;
+  try {
+    el.currentTime = 0;
+    el.classList.add('playing');
+    const p = el.play();
+    if (p && p.catch) p.catch(() => el.classList.remove('playing'));
+  } catch (e) { el.classList.remove('playing'); }
+  el.onended = () => el.classList.remove('playing');
+}
+
+/* Punch hit FX — fires on every damage tick. The struck fighter's side
+   of the screen (P1 = left, P2 = right) gets an anime burst video, a few
+   sparks and a comic "POW!"-style word. Lightweight so the rapid 0.7s
+   combo can retrigger it instantly. */
+const HIT_WORDS = ['POW!', 'BAM!', 'WHAM!', 'CRACK!', 'BIFF!', 'SMACK!', 'BOOM!'];
+function hitEffect(struck) {
+  const cool = (struck === 'p2');
+  // Jittered position on the struck fighter's half of the screen
+  const baseX = struck === 'p1' ? 30 : 70;
+  const x = baseX + (Math.random() - 0.5) * 12;   // vw
+  const y = 52 + (Math.random() - 0.5) * 16;       // %
+
+  // Anime burst video on the struck side (warm for P1, cool/cyan for P2)
+  playFxVideo(cool ? 'hitCool' : 'hitWarm', { left: x + 'vw', top: y + '%' });
+  // Expanding shockwave (white flash + energy burst) so each punch reads big
+  playFxVideo('shockCool', { left: x + 'vw', top: y + '%', width: '50vw' });
+
+  // CSS burst underneath (instant flash + fallback if the webm is missing)
+  const burst = document.createElement('div');
+  burst.className = 'hit-burst' + (cool ? ' cool' : '');
+  burst.style.left = x + 'vw';
+  burst.style.top  = y + '%';
+  document.body.appendChild(burst);
+  requestAnimationFrame(() => burst.classList.add('go'));
+  setTimeout(() => burst.remove(), 520);
+
+  // (comic "POW!" word removed per request)
+
+  // A few sparks + the screen shake
+  spawnSparks(struck, cool, 12, 4);
+  hitShake();
+}
+
+function simulateEnter() {
+  if (phase === 'selecting') {
+    if (bothPlayersReady()) {
+      phase = 'vs';
+      swapMusicForPhase('vs');   // <-- music swaps to show track here
+      triggerVS();
+    } else {
+      confirm('p1');
+    }
+  } else if (phase === 'vs') {
+    phase = 'fighting';
+    startFight();
+  }
+}
+
+// Big center "3 / 2 / 1 / GO" round-start text. Re-triggers its pop
+// animation on every call by toggling the .tick class with a reflow.
+function showCountdown(text) {
+  const el = document.getElementById('fightCount');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('go', String(text).toUpperCase() === 'GO');
+  el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
+}
+
+function spliceShowTrack(toSeconds) {
+  if (!bgmShow) return;
+  bgmShow.currentTime = Math.max(0, toSeconds);
+  // Reset lastShowCueIdx so cues after the splice target can still fire
+  // (lastShowCueIdx is already monotonic relative to cue array, but the
+  // array is sorted by t — if a cue has t < toSeconds but hasn't fired,
+  // we mark it as already-handled so the runner doesn't re-fire stale ones)
+  for (let i = lastShowCueIdx + 1; i < SHOW_CUES.length; i++) {
+    if (SHOW_CUES[i].t > toSeconds) break;
+    lastShowCueIdx = i;
+  }
+}
+
+function playUltiVideo(side = 'p1', kill = false) {
+  if (phase !== 'fighting') {
+    phase = 'fighting';
+    startFight();
+  }
+  const v = document.getElementById('ultiVideo');
+  v.muted = false;
+  v.currentTime = 0;
+  v.classList.add('show');
+  const playP = v.play();
+  if (playP && playP.catch) playP.catch(err => console.warn('ulti video play failed:', err));
+  // (ULTIMATE! callout text removed per request)
+  hitShake();
+
+  // The lethal blow lands AFTER the cinematic finishes: when the ulti
+  // video ends we hide it, drain the loser's bar to 0, then a short beat
+  // later pop the K.O. + "<lead> WINS!" banner — all on the fight screen,
+  // not hidden behind the full-screen video.
+  const opp = side === 'p1' ? 'p2' : 'p1';
+  v.onended = () => {
+    v.classList.remove('show');
+    if (!kill || !fight[opp] || fight[opp].defeated) return;
+    fight[opp].hp = 0;
+    renderFightHUD(opp);                    // bar visibly drains to empty
+    setTimeout(() => handleKO(opp), 600);   // then K.O. -> "AARON WINS!"
+  };
+}
+
+function runCue(cue) {
+  switch (cue.do) {
+    case 'cursor':      gotoCursor(cue.side, cue.row, cue.col); break;
+    case 'pick':        confirm(cue.side); break;
+    case 'enter':       simulateEnter(); break;
+    case 'count':       showCountdown(cue.text); break;
+    case 'fx':          playFxVideo(cue.id, { left: cue.left, top: cue.top, width: cue.width }); break;
+    case 'challenger':  showChallenger(cue.idx); break;
+    case 'damage':      applyExactDamage(cue.side, cue.amount); break;
+    // Block-positioned moves (10 vertical columns; block N center = (N*10-5)vw)
+    case 'hit':         hitAtBlock(cue.block, cue.side, cue.amount); break;
+    case 'block':       blockAtBlock(cue.block); break;
+    case 'miss':        missAtBlock(cue.block); break;
+    case 'fireball':    playMediumFX(cue.side, { amount: cue.amount }); break;
+    // Split fireball: song-locked precision. Pair a fire-visual cue with
+    // a fire-impact cue ~1.28s later so the burst lands on the beat.
+    case 'fire-visual': playMediumFXVisual(cue.side); break;
+    case 'fire-impact': playMediumFXImpact(cue.side, { amount: cue.amount }); break;
+    case 'splice':      spliceShowTrack(cue.to); break;
+    case 'ulti':        playUltiVideo(cue.side || 'p1', !!cue.kill); break;
+    default:            console.warn('unknown cue', cue);
+  }
+}
+
+/* ---- 10-column block coordinate system --------------------------------
+   The screen is 10 vertical blocks. Block N (1..10) is centered at
+   (N*10 - 5)vw — so block 1 = 5vw (far left), block 6 = 55vw, block 10 = 95vw. */
+function blockX(n) { return (n * 10 - 5) + 'vw'; }
+
+// A punch that LANDS at a column: sharp white impact + flash + sparks +
+// shake, and applies damage to the struck side (KO handled downstream).
+function hitAtBlock(block, struck, amount) {
+  const x = blockX(block);
+  playFxVideo('punchFx', { left: x, top: '50%' });
+  // quick white flash burst behind the impact
+  const burst = document.createElement('div');
+  burst.className = 'hit-burst';
+  burst.style.left = x; burst.style.top = '50%';
+  document.body.appendChild(burst);
+  requestAnimationFrame(() => burst.classList.add('go'));
+  setTimeout(() => burst.remove(), 500);
+  spawnSparks(struck === 'p2' ? 'p2' : 'p1', struck === 'p2', 10, 3);
+  hitShake();
+  // Damage (no extra default hit fx — this cue positions its own)
+  const f = fight[struck];
+  if (f && !f.defeated) {
+    f.hp = Math.max(0, f.hp - (amount || 0));
+    if (f.hp <= 0) handleKO(struck);
+    renderFightHUD(struck);
+  }
+}
+
+// A BLOCK at a column: crystalline clash, cool & contained, NO damage.
+function blockAtBlock(block) {
+  playFxVideo('blockFx', { left: blockX(block), top: '50%' });
+  hitShake();
+}
+
+// A MISS at a column: fast whiff swipe, NO impact, NO damage.
+function missAtBlock(block) {
+  const w = document.getElementById('whiffFx');
+  if (!w) return;
+  w.style.left = blockX(block);
+  w.style.top  = '50%';
+  w.classList.remove('go'); void w.offsetWidth; w.classList.add('go');
+}
+
+function tickChoreography() {
+  if (!showRunning) { tickActive = false; return; }
+
+  // ---- SELECT cues: wall-clock from P-press, only while still selecting
+  if (phase === 'selecting') {
+    const elapsed = (performance.now() - showStartedAt) / 1000;
+    while (
+      lastSelectCueIdx + 1 < SELECT_CUES.length &&
+      SELECT_CUES[lastSelectCueIdx + 1].t <= elapsed
+    ) {
+      lastSelectCueIdx++;
+      try { runCue(SELECT_CUES[lastSelectCueIdx]); }
+      catch (err) { console.warn('select cue error', err); }
+    }
+  }
+
+  // ---- SHOW cues: against the show-track's own playhead
+  if (!bgmShow.paused) {
+    const t = bgmShow.currentTime || 0;
+    while (
+      lastShowCueIdx + 1 < SHOW_CUES.length &&
+      SHOW_CUES[lastShowCueIdx + 1].t <= t
+    ) {
+      lastShowCueIdx++;
+      try { runCue(SHOW_CUES[lastShowCueIdx]); }
+      catch (err) { console.warn('show cue error', err); }
+    }
+  }
+
+  requestAnimationFrame(tickChoreography);
+}
+
+function startShow() {
+  reset();
+  bgmStarted = false;
+
+  // Unlock audio context (required after user gesture)
+  audio();
+
+  // Start with SELECT music from 0
+  bgmSelect.muted = false;
+  bgmShow.muted   = false;
+  bgmSelect.currentTime = 0;
+  bgmShow.pause();
+  bgmShow.currentTime = 0;
+  const p = bgmSelect.play();
+  if (p && p.catch) p.catch(err => console.warn('select bgm:', err));
+  bgmStarted = true;
+
+  showStartedAt    = performance.now();
+  lastSelectCueIdx = -1;
+  lastShowCueIdx   = -1;
+  showRunning = true;
+  ensureTick();
+}
+
+// Start the cue loop only if one isn't already running (prevents double-fire
+// when a jump happens mid-show).
+function ensureTick() {
+  if (!tickActive) { tickActive = true; requestAnimationFrame(tickChoreography); }
+}
+
+/* ------------------------------------------------------------------
+   jumpToSection(n) — rehearsal scrubbing. Number keys 1-4 jump the
+   show straight to a section, setting up the fight state + music so
+   that section plays correctly from there:
+     1  Top — full restart (select music + auto-picks)
+     2  VS screen — show track from SHOW_BGM_START_TIME, then auto-advances
+                   into the fight after VS_TO_FIGHT_DELAY
+     3  Second verse / fireballs     (show 68s)  R1 down, MARKUS in
+     4  Bridge / ulti                (show 112s) AARON down, KENG I in
+------------------------------------------------------------------ */
+function teamFight(p1Active, p1hp, p2Active, p2hp) {
+  fight.p1 = { team: [CHARACTERS[0], CHARACTERS[4]], activeIdx: p1Active, hp: p1hp, defeated: false }; // AARON, KENG I
+  fight.p2 = { team: [CHARACTERS[7], CHARACTERS[5]], activeIdx: p2Active, hp: p2hp, defeated: false }; // BRAYDON, MARKUS
+}
+function setShowCueIndexForTime(t) {
+  lastShowCueIdx = -1;
+  for (let i = 0; i < SHOW_CUES.length; i++) {
+    if (SHOW_CUES[i].t <= t) lastShowCueIdx = i; else break;
+  }
+}
+function jumpToSection(n) {
+  audio(); // unlock audio on the keypress
+
+  // Clear lingering overlays
+  document.getElementById('vsScreen').classList.remove('visible');
+  document.getElementById('fightKO').classList.remove('show');
+  const uv = document.getElementById('ultiVideo'); uv.pause(); uv.classList.remove('show');
+  document.getElementById('koVideo').classList.remove('playing');
+
+  if (n === 1) { startShow(); return; }   // full restart from the top
+
+  if (n === 2) {
+    // Start at the VS screen; the SHOW_CUES 'enter' beat carries it into
+    // the fight VS_TO_FIGHT_DELAY seconds later, same as the natural flow.
+    state.p1.selections = [0, 4]; state.p1.done = true;   // AARON + KENG I
+    state.p2.selections = [7, 5]; state.p2.done = true;   // BRAYDON + MARKUS
+    phase = 'vs';
+    triggerVS();
+
+    lastSelectCueIdx = SELECT_CUES.length;  // skip all select cues
+    setShowCueIndexForTime(SHOW_BGM_START_TIME);
+
+    bgmSelect.pause();
+    bgmShow.muted = muted;
+    bgmShow.currentTime = SHOW_BGM_START_TIME;
+    const p = bgmShow.play();
+    if (p && p.catch) p.catch(err => console.warn('show bgm:', err));
+
+    showRunning = true;
+    ensureTick();
+    return;
+  }
+
+  // Sections 3-4: jump straight into the fight on the show track
+  state.p1.selections = [0, 4]; state.p1.done = true;   // AARON + KENG I
+  state.p2.selections = [7, 5]; state.p2.done = true;   // BRAYDON + MARKUS
+  phase = 'fighting';
+  // Show the fight screen / hide select-grid layers
+  const fs = document.getElementById('fightScreen');
+  fs.classList.remove('visible'); void fs.offsetWidth; fs.classList.add('visible');
+
+  let t;
+  if (n === 3)      { teamFight(0, 54, 1, 100); t = 68;  }  // fireballs: AARON ~54hp, MARKUS in
+  else if (n === 4) { teamFight(1, 100, 1, 100); t = 112; }  // ulti: KENG I in, MARKUS in
+  else return;
+
+  renderFightHUD('p1'); renderFightHUD('p2');
+  setShowCueIndexForTime(t);
+  lastSelectCueIdx = SELECT_CUES.length;  // skip all select cues
+
+  // Switch to the show track at the section time and play
+  bgmSelect.pause();
+  bgmShow.muted = muted;
+  bgmShow.currentTime = t;
+  const p = bgmShow.play();
+  if (p && p.catch) p.catch(err => console.warn('show bgm:', err));
+
+  showRunning = true;
+  ensureTick();
+}
+
+function stopShow() {
+  showRunning = false;
+  bgmSelect.pause();
+  bgmShow.pause();
+  const v = document.getElementById('ultiVideo');
+  v.pause(); v.classList.remove('show');
+}
+
+/* ==================================================================
+   ============  UNLOCK AUDIO + KEYBOARD  ============================
+   ================================================================== */
+function unlockAudio() {
+  audio();
+  startBGM();
+}
+
+document.addEventListener('click', unlockAudio, { once: false });
+
+document.addEventListener('keydown', (e) => {
+  unlockAudio();
+
+  // Global (work in any phase)
+  if (e.key === 'r' || e.key === 'R') { stopShow(); reset(); return; }
+  if (e.key === 'm' || e.key === 'M') { setMuted(!muted); return; }
+  if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+    return;
+  }
+  // Show controls: P starts the time-locked show, O stops it
+  if (e.key === 'p' || e.key === 'P') { startShow(); e.preventDefault(); return; }
+  if (e.key === 'o' || e.key === 'O') { stopShow(); e.preventDefault(); return; }
+  // Section scrub (rehearsal): 1=top  2=chorus/fight  3=fireballs  4=ulti
+  if (e.key === '1') { jumpToSection(1); e.preventDefault(); return; }
+  if (e.key === '2') { jumpToSection(2); e.preventDefault(); return; }
+  if (e.key === '3') { jumpToSection(3); e.preventDefault(); return; }
+  if (e.key === '4') { jumpToSection(4); e.preventDefault(); return; }
+
+  // Enter advances the phase: selecting->vs->fighting (when both players ready)
+  if (e.key === 'Enter') {
+    if (phase === 'selecting') {
+      if (bothPlayersReady()) {
+        phase = 'vs';
+        swapMusicForPhase('vs');
+        triggerVS();
+      } else {
+        confirm('p1');
+      }
+      e.preventDefault();
+      return;
+    }
+    if (phase === 'vs') {
+      phase = 'fighting';
+      startFight();
+      e.preventDefault();
+      return;
+    }
+    // (in fighting phase Enter is unused - prevents accidental restart)
+    e.preventDefault();
+    return;
+  }
+
+  // ----- FIGHT PHASE: operator controls --------------------------------
+  if (phase === 'fighting') {
+    switch (e.key.toLowerCase()) {
+      // P1 health
+      case 'a': damagePlayer('p1'); e.preventDefault(); return;
+      case 'd': healPlayer('p1');   e.preventDefault(); return;
+      // P1 moves
+      case 'q': playMediumFX('p1'); e.preventDefault(); return;
+      case 'e': playSuperFX('p1');  e.preventDefault(); return;
+      // P2 moves (keys near right-hand)
+      case '[': playMediumFX('p2'); e.preventDefault(); return;
+      case ']': playSuperFX('p2');  e.preventDefault(); return;
+    }
+    switch (e.key) {
+      case 'ArrowLeft':  damagePlayer('p2'); e.preventDefault(); return;
+      case 'ArrowRight': healPlayer('p2');   e.preventDefault(); return;
+    }
+    return;
+  }
+
+  // ----- SELECTING PHASE -----------------------------------------------
+  // P1: WASD
+  switch (e.key.toLowerCase()) {
+    case 'w': move('p1', -1, 0); e.preventDefault(); return;
+    case 's': move('p1',  1, 0); e.preventDefault(); return;
+    case 'a': move('p1',  0, -1); e.preventDefault(); return;
+    case 'd': move('p1',  0,  1); e.preventDefault(); return;
+  }
+
+  // P2: Arrows + Right Shift
+  switch (e.key) {
+    case 'ArrowUp':    move('p2', -1, 0); e.preventDefault(); return;
+    case 'ArrowDown':  move('p2',  1, 0); e.preventDefault(); return;
+    case 'ArrowLeft':  move('p2',  0, -1); e.preventDefault(); return;
+    case 'ArrowRight': move('p2',  0,  1); e.preventDefault(); return;
+  }
+  if (e.code === 'ShiftRight' || (e.key === 'Shift' && e.location === 2)) {
+    confirm('p2'); e.preventDefault(); return;
+  }
+});
+
+/* ==================================================================
+   ============  INIT + RESIZE HANDLER  ==============================
+   ================================================================== */
+function initLayout() {
+  recomputeSlotOffsets();
+  updateCursors();
+  updatePreview('p1');
+  updatePreview('p2');
+  updateHoverPreview('p1');
+  updateHoverPreview('p2');
+}
+window.addEventListener('resize', () => {
+  recomputeSlotOffsets();
+  updateCursors();
+});
+window.addEventListener('load', initLayout);
+requestAnimationFrame(() => requestAnimationFrame(initLayout));
+</script>
+</body>
+</html>
